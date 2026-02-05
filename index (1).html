@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neurostatus Dokumentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🧠 Neurologische Untersuchung - Hirnstatus</h1>
+            <div class="header-info">
+                <span id="currentDate"></span>
+            </div>
+        </header>
+
+        <!-- Hauptbereich -->
+        <div class="main-content">
+            <!-- Linke Seite: Untersuchungsformular -->
+            <div class="examination-form">
+                
+                <!-- Hirnnerven -->
+                <div class="examination-group">
+                    <h2>1. Hirnnerven</h2>
+                    
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0110" data-points="19.57" data-category="hirnnerven">
+                            <span>N. I - Riechprüfung (Olfactorius)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0120" data-points="28.45" data-category="hirnnerven">
+                            <span>N. II - Visus und Gesichtsfeld (Opticus)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0130" data-points="35.20" data-category="hirnnerven">
+                            <span>N. III, IV, VI - Pupillomotorik und Augenbewegungen</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0140" data-points="24.80" data-category="hirnnerven">
+                            <span>N. V - Sensibilität Gesicht, Masseterreflex (Trigeminus)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0150" data-points="22.15" data-category="hirnnerven">
+                            <span>N. VII - Faziale Motorik (Facialis)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0160" data-points="18.90" data-category="hirnnerven">
+                            <span>N. VIII - Hörprüfung, Gleichgewicht (Vestibulocochlearis)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0170" data-points="15.30" data-category="hirnnerven">
+                            <span>N. IX, X - Gaumen, Schluckakt (Glossopharyngeus, Vagus)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0180" data-points="12.45" data-category="hirnnerven">
+                            <span>N. XI - Kopfdrehung, Schulterhebung (Accessorius)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0190" data-points="14.20" data-category="hirnnerven">
+                            <span>N. XII - Zungenmotorik (Hypoglossus)</span>
+                        </label>
+                    </div>
+                    
+                    <div class="notes-field">
+                        <label for="notes-hirnnerven">Bemerkungen zu Hirnnerven:</label>
+                        <textarea id="notes-hirnnerven" rows="3" placeholder="Präzisierungen, Auffälligkeiten..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Motorik -->
+                <div class="examination-group">
+                    <h2>2. Motorik</h2>
+                    
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0210" data-points="42.30" data-category="motorik">
+                            <span>Kraftprüfung obere Extremitäten (differenziert)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0220" data-points="42.30" data-category="motorik">
+                            <span>Kraftprüfung untere Extremitäten (differenziert)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0230" data-points="28.60" data-category="motorik">
+                            <span>Tonusprüfung (Spastik, Rigor)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0240" data-points="35.80" data-category="motorik">
+                            <span>Koordination: Finger-Nase-Versuch, Knie-Hacke-Versuch</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0250" data-points="25.40" data-category="motorik">
+                            <span>Diadochokinese</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0260" data-points="22.90" data-category="motorik">
+                            <span>Romberg-Versuch, Gangprüfung</span>
+                        </label>
+                    </div>
+                    
+                    <div class="notes-field">
+                        <label for="notes-motorik">Bemerkungen zur Motorik:</label>
+                        <textarea id="notes-motorik" rows="3" placeholder="Präzisierungen, Auffälligkeiten..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Sensibilität -->
+                <div class="examination-group">
+                    <h2>3. Sensibilität</h2>
+                    
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0310" data-points="38.70" data-category="sensibilitaet">
+                            <span>Oberflächensensibilität (Berührung, Schmerz, Temperatur)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0320" data-points="41.20" data-category="sensibilitaet">
+                            <span>Tiefensensibilität (Lagesinn, Vibration)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0330" data-points="28.50" data-category="sensibilitaet">
+                            <span>Stereognosie, Graphästhesie</span>
+                        </label>
+                    </div>
+                    
+                    <div class="notes-field">
+                        <label for="notes-sensibilitaet">Bemerkungen zur Sensibilität:</label>
+                        <textarea id="notes-sensibilitaet" rows="3" placeholder="Präzisierungen, Auffälligkeiten..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Reflexe -->
+                <div class="examination-group">
+                    <h2>4. Reflexe</h2>
+                    
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0410" data-points="32.40" data-category="reflexe">
+                            <span>Bizepssehnenreflex (BSR)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0420" data-points="32.40" data-category="reflexe">
+                            <span>Trizepssehnenreflex (TSR)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0430" data-points="32.40" data-category="reflexe">
+                            <span>Patellarsehnenreflex (PSR)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0440" data-points="32.40" data-category="reflexe">
+                            <span>Achillessehnenreflex (ASR)</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0450" data-points="28.90" data-category="reflexe">
+                            <span>Bauchhautreflexe</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0460" data-points="24.70" data-category="reflexe">
+                            <span>Babinski-Reflex</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0470" data-points="22.30" data-category="reflexe">
+                            <span>Weitere pathologische Reflexe (Gordon, Oppenheim)</span>
+                        </label>
+                    </div>
+                    
+                    <div class="notes-field">
+                        <label for="notes-reflexe">Bemerkungen zu Reflexen:</label>
+                        <textarea id="notes-reflexe" rows="3" placeholder="Präzisierungen, Auffälligkeiten..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Weitere Zeichen -->
+                <div class="examination-group">
+                    <h2>5. Weitere neurologische Zeichen</h2>
+                    
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0510" data-points="18.60" data-category="weitere">
+                            <span>Meningismus-Prüfung</span>
+                        </label>
+                        
+                        <label>
+                            <input type="checkbox" data-tardoc="00.0520" data-points="25.40" data-category="weitere">
+                            <span>Prüfung auf extrapyramidale Zeichen</span>
+                        </label>
+                    </div>
+                    
+                    <div class="notes-field">
+                        <label for="notes-weitere">Bemerkungen zu weiteren Zeichen:</label>
+                        <textarea id="notes-weitere" rows="3" placeholder="Präzisierungen, Auffälligkeiten..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Aktionen -->
+                <div class="actions">
+                    <button id="printBtn" class="btn-primary">🖨️ Drucken</button>
+                    <button id="resetBtn" class="btn-secondary">🔄 Zurücksetzen</button>
+                </div>
+            </div>
+
+            <!-- Rechte Seite: TARDOC-Anzeige und Ampel -->
+            <div class="sidebar">
+                <!-- Ampelsystem -->
+                <div class="traffic-light-container">
+                    <h3>Leistungserfüllung</h3>
+                    <div class="traffic-light">
+                        <div class="light red active" id="lightRed"></div>
+                        <div class="light yellow" id="lightYellow"></div>
+                        <div class="light green" id="lightGreen"></div>
+                    </div>
+                    <div class="traffic-light-status" id="statusText">
+                        Unvollständig - Weitere Untersuchungen erforderlich
+                    </div>
+                    <div class="completion-info" id="completionInfo">
+                        0 von 27 Untersuchungen durchgeführt (0%)
+                    </div>
+                </div>
+
+                <!-- TARDOC Codes -->
+                <div class="tardoc-display">
+                    <h3>Ausgewählte TARDOC-Codes</h3>
+                    <div id="tardocList" class="tardoc-list">
+                        <p class="empty-state">Keine Untersuchungen ausgewählt</p>
+                    </div>
+                    <div class="tardoc-summary">
+                        <strong>Gesamt Taxpunkte: <span id="totalPoints">0.00</span></strong>
+                    </div>
+                </div>
+
+                <!-- Legende -->
+                <div class="legend">
+                    <h4>Ampel-Legende:</h4>
+                    <ul>
+                        <li><span class="legend-red">🔴</span> Rot: &lt; 50% durchgeführt</li>
+                        <li><span class="legend-yellow">🟡</span> Gelb: 50-79% durchgeführt</li>
+                        <li><span class="legend-green">🟢</span> Grün: ≥ 80% durchgeführt</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
