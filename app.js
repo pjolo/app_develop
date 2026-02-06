@@ -1,20 +1,28 @@
-// =====================================================
-// KONSTANTEN & KONFIGURATION
-// =====================================================
+// ==========================================
+// KONSTANTEN
+// ==========================================
 
 const AA05_0130_POINTS = 25.69;
 
-const REQUIREMENTS = {
-    vigilanz: { min: 1, total: 3, label: 'Vigilanz' },
-    hirnnerven: { min: 6, total: 12, label: 'Hirnnerven' },
-    motorik: { min: 5, total: 5, label: 'Motorik' },
-    sensibilitaet: { min: 1, total: 3, label: 'Sensibilität' },
-    reflexe: { min: 3, total: 7, label: 'Reflexe' }
+const AA05_REQUIREMENTS = {
+    vigilanz: 1,
+    hirnnerven: 6,
+    motorik: 5,
+    sensibilitaet: 1,
+    reflexe: 3
 };
 
-// =====================================================
-// STATE MANAGEMENT
-// =====================================================
+const CATEGORIES = [
+    { key: 'vigilanz', title: '0. VIGILANZ UND BEWUSSTSEIN' },
+    { key: 'hirnnerven', title: '1. HIRNNERVEN (I-XII)' },
+    { key: 'motorik', title: '2. MOTORIK' },
+    { key: 'sensibilitaet', title: '3. SENSIBILITÄT' },
+    { key: 'reflexe', title: '4. REFLEXE' }
+];
+
+// ==========================================
+// GLOBALE VARIABLEN
+// ==========================================
 
 let categoryProgress = {
     vigilanz: 0,
@@ -24,164 +32,261 @@ let categoryProgress = {
     reflexe: 0
 };
 
-let totalChecked = 0;
-const TOTAL_CHECKBOXES = 30;
-
-// =====================================================
+// ==========================================
 // INITIALISIERUNG
-// =====================================================
+// ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    initializeDateDisplay();
-    setupCheckboxListeners();
-    updateAllDisplays();
+    initializeEventListeners();
+    updateAllCounters();
 });
 
-function initializeDateDisplay() {
-    const dateElement = document.getElementById('currentDate');
-    const now = new Date();
-    const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    };
-    dateElement.textContent = now.toLocaleDateString('de-DE', options);
+function initializeEventListeners() {
+    // Checkbox-Listener
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateAllCounters);
+    });
+    
+    // Button-Listener
+    document.getElementById('generatePDF').addEventListener('click', generatePDF);
+    document.getElementById('resetForm').addEventListener('click', resetForm);
 }
 
-// =====================================================
-// CHECKBOX-LISTENER
-// =====================================================
+// ==========================================
+// COUNTER-UPDATES
+// ==========================================
 
-function setupCheckboxListeners() {
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const category = this.dataset.category;
-            
-            if (this.checked) {
-                categoryProgress[category]++;
-                totalChecked++;
-            } else {
-                categoryProgress[category]--;
-                totalChecked--;
-            }
-            
-            updateAllDisplays();
-        });
+function updateAllCounters() {
+    updateCategoryProgress();
+    updateTotalCount();
+    updateRequirements();
+    updateAAStatus(); // ✅ Ampel-Update
+}
+
+function updateCategoryProgress() {
+    CATEGORIES.forEach(cat => {
+        const checked = document.querySelectorAll(`input[data-category="${cat.key}"]:checked`).length;
+        categoryProgress[cat.key] = checked;
     });
 }
 
-// =====================================================
-// DISPLAY-UPDATES
-// =====================================================
-
-function updateAllDisplays() {
-    updateCategoryIndicators();
-    updateRequirementsList();
-    updateStatusLight();
-    updateCompletenessBar();
+function updateTotalCount() {
+    const total = Object.values(categoryProgress).reduce((sum, val) => sum + val, 0);
+    document.getElementById('totalCount').textContent = total;
 }
 
-function updateCategoryIndicators() {
-    document.querySelectorAll('.progress-indicator').forEach(indicator => {
-        const category = indicator.dataset.category;
-        const count = categoryProgress[category];
-        const total = REQUIREMENTS[category].total;
-        indicator.textContent = `${count}/${total}`;
+function updateRequirements() {
+    Object.keys(AA05_REQUIREMENTS).forEach(category => {
+        const required = AA05_REQUIREMENTS[category];
+        const current = categoryProgress[category];
+        const element = document.getElementById(`req-${category}`);
+        const parentItem = element.closest('.requirement-item');
         
-        // Farbcodierung
-        if (count >= REQUIREMENTS[category].min) {
-            indicator.style.background = '#d4edda';
-            indicator.style.color = '#155724';
-            indicator.style.borderColor = '#c3e6cb';
+        element.textContent = `${current}/${required}`;
+        
+        // Styling
+        parentItem.classList.remove('met', 'unmet');
+        if (current >= required) {
+            parentItem.classList.add('met');
         } else {
-            indicator.style.background = 'white';
-            indicator.style.color = '#7f8c8d';
-            indicator.style.borderColor = '#bdc3c7';
+            parentItem.classList.add('unmet');
         }
     });
 }
 
-function updateRequirementsList() {
-    Object.keys(REQUIREMENTS).forEach(category => {
-        const reqItem = document.querySelector(`.req-item[data-req="${category}"]`);
-        const icon = reqItem.querySelector('.req-icon');
-        const text = reqItem.querySelector('.req-text');
-        const count = categoryProgress[category];
-        const req = REQUIREMENTS[category];
-        
-        text.innerHTML = `${req.label}: <strong>${count}/${req.min}</strong>`;
-        
-        if (count >= req.min) {
-            reqItem.classList.add('met');
-            reqItem.classList.remove('not-met');
-            icon.textContent = '✅';
-        } else {
-            reqItem.classList.add('not-met');
-            reqItem.classList.remove('met');
-            icon.textContent = '❌';
-        }
-    });
-}
+// ==========================================
+// ✅ AMPEL-SYSTEM: NUR ROT/GRÜN LOGIK
+// ==========================================
 
-function updateStatusLight() {
-    const allMet = checkAllRequirementsMet();
-    const statusLight = document.getElementById('statusLight');
-    const statusText = document.getElementById('statusText');
+function updateAAStatus() {
+    const requirements = [
+        { key: 'vigilanz', required: 1, current: categoryProgress.vigilanz },
+        { key: 'hirnnerven', required: 6, current: categoryProgress.hirnnerven },
+        { key: 'motorik', required: 5, current: categoryProgress.motorik },
+        { key: 'sensibilitaet', required: 1, current: categoryProgress.sensibilitaet },
+        { key: 'reflexe', required: 3, current: categoryProgress.reflexe }
+    ];
+    
+    // ✅ EINE PRÜFUNG: Sind ALLE Anforderungen erfüllt?
+    const allMet = requirements.every(req => req.current >= req.required);
+    
+    // DOM-Elemente
+    const redLight = document.getElementById('aaRed');
+    const greenLight = document.getElementById('aaGreen');
+    const statusText = document.getElementById('aaStatusText');
+    const taxpunkteDiv = document.getElementById('aaTaxpunkte');
     const taxpunkteValue = document.getElementById('taxpunkteValue');
     
+    // Alle Lichter zurücksetzen
+    redLight.classList.remove('active');
+    greenLight.classList.remove('active');
+    
     if (allMet) {
-        statusLight.className = 'status-light green';
-        statusText.textContent = 'Abrechenbar';
-        statusText.style.color = '#27ae60';
-        taxpunkteValue.textContent = `${AA05_0130_POINTS.toFixed(2)} TP`;
-        taxpunkteValue.classList.add('active');
+        // ✅ GRÜN: ALLE Anforderungen erfüllt
+        greenLight.classList.add('active');
+        statusText.innerHTML = '<strong>Status:</strong> ✅ Abrechenbar<br><small>Alle Anforderungen erfüllt</small>';
+        taxpunkteDiv.style.display = 'block';
+        taxpunkteValue.textContent = AA05_0130_POINTS.toFixed(2);
     } else {
-        statusLight.className = 'status-light red';
-        statusText.textContent = 'Nicht abrechenbar';
-        statusText.style.color = '#e74c3c';
-        taxpunkteValue.textContent = '0.00 TP';
-        taxpunkteValue.classList.remove('active');
+        // 🔴 ROT: Mindestens EINE Anforderung nicht erfüllt
+        redLight.classList.add('active');
+        statusText.innerHTML = '<strong>Status:</strong> ❌ Nicht abrechenbar<br><small>Mindestanforderungen nicht erfüllt</small>';
+        taxpunkteDiv.style.display = 'none';
+        
+        // Zeige welche Anforderungen fehlen
+        const missing = requirements.filter(req => req.current < req.required);
+        if (missing.length > 0) {
+            const labels = {
+                'vigilanz': 'Vigilanz',
+                'hirnnerven': 'Hirnnerven',
+                'motorik': 'Motorik',
+                'sensibilitaet': 'Sensibilität',
+                'reflexe': 'Reflexe'
+            };
+            
+            const missingText = missing.map(req => 
+                `${labels[req.key]} (${req.current}/${req.required})`
+            ).join(', ');
+            
+            statusText.innerHTML += `<div style="margin-top: 8px; font-size: 11px; opacity: 0.8;">Fehlend: ${missingText}</div>`;
+        }
     }
 }
 
-function updateCompletenessBar() {
-    const percentage = (totalChecked / TOTAL_CHECKBOXES) * 100;
-    const progressFill = document.getElementById('progressFill');
-    const completenessPercent = document.getElementById('completenessPercent');
-    const completenessCount = document.getElementById('completenessCount');
-    
-    progressFill.style.width = `${percentage}%`;
-    completenessPercent.textContent = `${Math.round(percentage)}%`;
-    completenessCount.textContent = `${totalChecked}/${TOTAL_CHECKBOXES} Punkte`;
-}
+// ==========================================
+// PDF-GENERIERUNG
+// ==========================================
 
-// =====================================================
-// ANFORDERUNGSPRÜFUNG
-// =====================================================
-
-function checkAllRequirementsMet() {
-    return Object.keys(REQUIREMENTS).every(category => {
-        return categoryProgress[category] >= REQUIREMENTS[category].min;
-    });
-}
-
-// =====================================================
-// DRUCK-FUNKTIONALITÄT
-// =====================================================
-
-function handlePrint() {
+function generatePDF() {
     const printWindow = window.open('', '_blank');
-    printWindow.document.write(generatePrintContent());
-    printWindow.document.close();
+    const content = generatePrintContent();
     
-    setTimeout(() => {
-        printWindow.print();
-    }, 500);
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+            <meta charset="UTF-8">
+            <title>Neurologische Untersuchung - ${new Date().toLocaleDateString('de-DE')}</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { 
+                    font-family: Arial, sans-serif; 
+                    padding: 30px; 
+                    line-height: 1.6;
+                    color: #2c3e50;
+                }
+                .header {
+                    text-align: center;
+                    border-bottom: 3px solid #3498db;
+                    padding-bottom: 15px;
+                    margin-bottom: 25px;
+                }
+                .header h1 { 
+                    font-size: 24px; 
+                    color: #2c3e50;
+                    margin-bottom: 8px;
+                }
+                .header .date { 
+                    color: #7f8c8d; 
+                    font-size: 14px;
+                }
+                .tardoc-info {
+                    background: #ecf0f1;
+                    padding: 12px;
+                    border-radius: 6px;
+                    margin-bottom: 20px;
+                    text-align: center;
+                    font-weight: bold;
+                    color: #34495e;
+                }
+                .aa-status {
+                    border: 3px solid #27ae60;
+                    background: #d4edda;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    text-align: center;
+                }
+                .aa-status.incomplete {
+                    border-color: #e74c3c;
+                    background: #f8d7da;
+                }
+                .aa-status h3 {
+                    margin-bottom: 8px;
+                    font-size: 18px;
+                }
+                .section {
+                    margin-bottom: 25px;
+                    page-break-inside: avoid;
+                }
+                .section h2 {
+                    color: #2c3e50;
+                    font-size: 16px;
+                    border-bottom: 2px solid #3498db;
+                    padding-bottom: 6px;
+                    margin-bottom: 12px;
+                }
+                .item-list {
+                    list-style-position: inside;
+                    padding-left: 0;
+                }
+                .item-list li {
+                    padding: 6px 0;
+                    padding-left: 15px;
+                    border-bottom: 1px dotted #ecf0f1;
+                }
+                .item-list li:last-child {
+                    border-bottom: none;
+                }
+                .remarks-box {
+                    margin-top: 10px;
+                    padding: 12px;
+                    background: #f8f9fa;
+                    border-left: 3px solid #3498db;
+                    font-style: italic;
+                    color: #555;
+                }
+                .remarks-section {
+                    background: #fff9e6;
+                    border: 2px solid #f39c12;
+                    border-radius: 6px;
+                    padding: 15px;
+                    margin-top: 20px;
+                }
+                .remarks-section h3 {
+                    color: #f39c12;
+                    margin-bottom: 10px;
+                }
+                .footer {
+                    margin-top: 30px;
+                    padding-top: 15px;
+                    border-top: 2px solid #ecf0f1;
+                    text-align: center;
+                    color: #95a5a6;
+                    font-size: 12px;
+                }
+                @media print {
+                    body { padding: 20px; }
+                    .section { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            ${content}
+            <script>
+                window.onload = function() {
+                    window.print();
+                }
+            </script>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
 }
 
 function generatePrintContent() {
-    const allMet = checkAllRequirementsMet();
     const now = new Date();
     const dateStr = now.toLocaleDateString('de-DE', { 
         weekday: 'long', 
@@ -190,131 +295,36 @@ function generatePrintContent() {
         day: 'numeric' 
     });
     
+    // Prüfe Abrechnungsstatus
+    const requirements = [
+        { key: 'vigilanz', required: 1, current: categoryProgress.vigilanz },
+        { key: 'hirnnerven', required: 6, current: categoryProgress.hirnnerven },
+        { key: 'motorik', required: 5, current: categoryProgress.motorik },
+        { key: 'sensibilitaet', required: 1, current: categoryProgress.sensibilitaet },
+        { key: 'reflexe', required: 3, current: categoryProgress.reflexe }
+    ];
+    
+    const allMet = requirements.every(req => req.current >= req.required);
+    
     let html = `
-    <!DOCTYPE html>
-    <html lang="de">
-    <head>
-        <meta charset="UTF-8">
-        <title>Neurostatus - ${dateStr}</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 40px 20px;
-                color: #2c3e50;
-            }
-            
-            .print-header {
-                text-align: center;
-                border-bottom: 3px solid #2c3e50;
-                padding-bottom: 20px;
-                margin-bottom: 30px;
-            }
-            
-            .print-header h1 {
-                font-size: 24px;
-                margin-bottom: 10px;
-                color: #2c3e50;
-            }
-            
-            .print-header .date {
-                font-size: 14px;
-                color: #7f8c8d;
-            }
-            
-            .pdf-info {
-                padding: 15px 0;
-                border-bottom: 2px solid #34495e;
-                margin-bottom: 25px;
-            }
-            
-            .pdf-info p {
-                margin: 5px 0;
-                font-size: 14px;
-            }
-            
-            .section {
-                margin-bottom: 25px;
-                page-break-inside: avoid;
-            }
-            
-            .section h2 {
-                font-size: 16px;
-                color: #2c3e50;
-                border-bottom: 2px solid #ecf0f1;
-                padding-bottom: 8px;
-                margin-bottom: 12px;
-            }
-            
-            .item-list {
-                list-style: none;
-                padding-left: 0;
-            }
-            
-            .item-list li {
-                padding: 6px 0;
-                padding-left: 25px;
-                position: relative;
-            }
-            
-            .item-list li:before {
-                content: '✓';
-                position: absolute;
-                left: 0;
-                color: #27ae60;
-                font-weight: bold;
-            }
-            
-            .remarks-box {
-                background: #f8f9fa;
-                border: 1px solid #dee2e6;
-                border-radius: 4px;
-                padding: 15px;
-                margin-top: 10px;
-                white-space: pre-wrap;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-            
-            .empty-note {
-                color: #95a5a6;
-                font-style: italic;
-            }
-            
-            @media print {
-                body {
-                    padding: 20px;
-                }
-                
-                .section {
-                    page-break-inside: avoid;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="print-header">
-            <h1>NEUROLOGISCHE UNTERSUCHUNG - HIRNSTATUS</h1>
-            <div class="date">${dateStr}</div>
+        <div class="header">
+            <h1>🧠 NEUROLOGISCHE UNTERSUCHUNG - HIRNSTATUS</h1>
+            <div class="date">Datum: ${dateStr}</div>
         </div>
         
-        <div class="pdf-info">
-            <p><strong>TARDOC:</strong> AA.05.0130 - Neurologische Untersuchung (Hirnstatus)</p>
+        <div class="tardoc-info">
+            TARDOC: AA.05.0130 - Neurologische Untersuchung
+        </div>
+        
+        <div class="aa-status ${allMet ? '' : 'incomplete'}">
+            <h3>${allMet ? '✅ ABRECHENBAR' : '❌ NICHT ABRECHENBAR'}</h3>
+            <p><strong>Status:</strong> ${allMet ? 'Mindestanforderungen erfüllt' : 'Mindestanforderungen nicht erfüllt'}</p>
             ${allMet ? `<p><strong>Taxpunkte:</strong> ${AA05_0130_POINTS.toFixed(2)} TP</p>` : ''}
         </div>
     `;
     
-    // Durchgeführte Untersuchungen nach Kategorien
-    const categories = [
-        { key: 'vigilanz', title: '0. Vigilanz und Bewusstsein' },
-        { key: 'hirnnerven', title: '1. Hirnnerven' },
-        { key: 'motorik', title: '2. Motorik' },
-        { key: 'sensibilitaet', title: '3. Sensibilität' },
-        { key: 'reflexe', title: '4. Reflexe' }
-    ];
-    
-    categories.forEach(cat => {
+    // Durchlaufe alle Kategorien
+    CATEGORIES.forEach(cat => {
         const checkboxes = document.querySelectorAll(`input[data-category="${cat.key}"]:checked`);
         
         if (checkboxes.length > 0) {
@@ -327,46 +337,59 @@ function generatePrintContent() {
                 html += `<li>${label}</li>`;
             });
             
-            html += `</ul></div>`;
+            html += `</ul>`;
+            
+            // ✅ Block-Kommentar hinzufügen
+            const blockComment = document.querySelector(`.block-comment[data-category="${cat.key}"]`);
+            if (blockComment && blockComment.value.trim()) {
+                html += `<div class="remarks-box"><strong>Bemerkung:</strong> ${blockComment.value.trim()}</div>`;
+            }
+            
+            html += `</div>`;
         }
     });
     
-    // Bemerkungen
-    const remarks = document.getElementById('remarks').value.trim();
-    html += `<div class="section">`;
-    html += `<h2>5. Bemerkungen</h2>`;
-    
-    if (remarks) {
-        html += `<div class="remarks-box">${remarks}</div>`;
-    } else {
-        html += `<div class="remarks-box empty-note">Keine Bemerkungen erfasst</div>`;
+    // Allgemeine Bemerkungen
+    const generalRemarks = document.getElementById('generalRemarks').value.trim();
+    if (generalRemarks) {
+        html += `
+            <div class="remarks-section">
+                <h3>📝 Allgemeine Bemerkungen</h3>
+                <p>${generalRemarks}</p>
+            </div>
+        `;
     }
     
-    html += `</div>`;
-    html += `</body></html>`;
+    html += `
+        <div class="footer">
+            Erstellt am ${now.toLocaleString('de-DE')} | Neurologische Untersuchung - Hirnstatus
+        </div>
+    `;
     
     return html;
 }
 
-// =====================================================
-// RESET-FUNKTIONALITÄT
-// =====================================================
+// ==========================================
+// FORMULAR ZURÜCKSETZEN
+// ==========================================
 
-function handleReset() {
+function resetForm() {
     if (confirm('Möchten Sie wirklich alle Eingaben zurücksetzen?')) {
-        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            cb.checked = false;
-        });
+        // Alle Checkboxen deaktivieren
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         
-        document.querySelectorAll('textarea').forEach(ta => {
-            ta.value = '';
-        });
+        // Alle Textareas leeren
+        document.querySelectorAll('textarea').forEach(ta => ta.value = '');
         
-        Object.keys(categoryProgress).forEach(key => {
-            categoryProgress[key] = 0;
-        });
-        totalChecked = 0;
+        // Counter zurücksetzen
+        categoryProgress = {
+            vigilanz: 0,
+            hirnnerven: 0,
+            motorik: 0,
+            sensibilitaet: 0,
+            reflexe: 0
+        };
         
-        updateAllDisplays();
+        updateAllCounters();
     }
 }
