@@ -75,10 +75,10 @@ header h1 {
     transition: all 0.3s ease;
 }
 
-.examination-group:hover {
+/*.examination-group:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     transform: translateX(5px);
-}
+} */
 
 .group-header {
     display: flex;
