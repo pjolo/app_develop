@@ -1,66 +1,55 @@
-// TARDOC-Datenbank mit Beschreibungen
-const tardocDatabase = {
-    '00.0110': 'Riechprüfung (N. I - Olfactorius)',
-    '00.0120': 'Visus und Gesichtsfeld (N. II - Opticus)',
-    '00.0130': 'Pupillomotorik und Augenbewegungen (N. III, IV, VI)',
-    '00.0140': 'Gesichtssensibilität und Masseterreflex (N. V - Trigeminus)',
-    '00.0150': 'Faziale Motorik (N. VII - Facialis)',
-    '00.0160': 'Hörprüfung und Gleichgewicht (N. VIII - Vestibulocochlearis)',
-    '00.0170': 'Gaumen und Schluckakt (N. IX, X)',
-    '00.0180': 'Kopfdrehung und Schulterhebung (N. XI - Accessorius)',
-    '00.0190': 'Zungenmotorik (N. XII - Hypoglossus)',
-    '00.0210': 'Kraftprüfung obere Extremitäten',
-    '00.0220': 'Kraftprüfung untere Extremitäten',
-    '00.0230': 'Tonusprüfung',
-    '00.0240': 'Koordinationsprüfung',
-    '00.0250': 'Diadochokinese',
-    '00.0260': 'Romberg-Versuch und Gangprüfung',
-    '00.0310': 'Oberflächensensibilität',
-    '00.0320': 'Tiefensensibilität',
-    '00.0330': 'Stereognosie und Graphästhesie',
-    '00.0410': 'Bizepssehnenreflex (BSR)',
-    '00.0420': 'Trizepssehnenreflex (TSR)',
-    '00.0430': 'Patellarsehnenreflex (PSR)',
-    '00.0440': 'Achillessehnenreflex (ASR)',
-    '00.0450': 'Bauchhautreflexe',
-    '00.0460': 'Babinski-Reflex',
-    '00.0470': 'Weitere pathologische Reflexe',
-    '00.0510': 'Meningismus-Prüfung',
-    '00.0520': 'Extrapyramidale Zeichen'
+// ===== KONFIGURATION =====
+const AA05_0130_POINTS = 25.69;
+
+const REQUIREMENTS = {
+    vigilanz: { min: 1, total: 3 },
+    hirnnerven: { min: 6, total: 12 },
+    motorik: { min: 5, total: 5 },
+    sensibilitaet: { min: 1, total: 3 },
+    reflexe: { min: 3, total: 7 }
 };
 
-// State Management
-let selectedCodes = new Set();
-let totalCheckboxes = 0;
-let checkedCheckboxes = 0;
+// ===== STATE =====
+let categoryProgress = {
+    vigilanz: 0,
+    hirnnerven: 0,
+    motorik: 0,
+    sensibilitaet: 0,
+    reflexe: 0
+};
 
-// Initialisierung
+let totalChecked = 0;
+const totalCheckboxes = 30;
+
+// ===== INITIALISIERUNG =====
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-    attachEventListeners();
-    updateTrafficLight();
+    // Datum anzeigen
+    displayCurrentDate();
+    
+    // Event Listeners
+    setupEventListeners();
+    
+    // Initiale Anzeige aktualisieren
+    updateAllDisplays();
 });
 
-// App initialisieren
-function initializeApp() {
-    // Datum anzeigen
+// ===== DATUM ANZEIGEN =====
+function displayCurrentDate() {
     const dateElement = document.getElementById('currentDate');
     const today = new Date();
-    dateElement.textContent = `Datum: ${today.toLocaleDateString('de-CH', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    })}`;
-    
-    // Anzahl Checkboxen zählen
-    totalCheckboxes = document.querySelectorAll('input[type="checkbox"][data-tardoc]').length;
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+    dateElement.textContent = today.toLocaleDateString('de-DE', options);
 }
 
-// Event Listeners
-function attachEventListeners() {
-    // Checkbox-Änderungen
-    const checkboxes = document.querySelectorAll('input[type="checkbox"][data-tardoc]');
+// ===== EVENT LISTENERS SETUP =====
+function setupEventListeners() {
+    // Alle Checkboxen
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', handleCheckboxChange);
     });
@@ -70,118 +59,173 @@ function attachEventListeners() {
     document.getElementById('resetBtn').addEventListener('click', handleReset);
 }
 
-// Checkbox-Änderung behandeln
+// ===== CHECKBOX CHANGE HANDLER =====
 function handleCheckboxChange(event) {
     const checkbox = event.target;
-    const tardocCode = checkbox.dataset.tardoc;
-    const points = parseFloat(checkbox.dataset.points);
+    const category = checkbox.dataset.category;
     
+    // Kategorie-Zähler aktualisieren
     if (checkbox.checked) {
-        selectedCodes.add(tardocCode);
-        checkedCheckboxes++;
+        categoryProgress[category]++;
+        totalChecked++;
     } else {
-        selectedCodes.delete(tardocCode);
-        checkedCheckboxes--;
+        categoryProgress[category]--;
+        totalChecked--;
     }
     
-    updateTardocDisplay();
-    updateTrafficLight();
+    // Displays aktualisieren
+    updateAllDisplays();
 }
 
-// TARDOC-Anzeige aktualisieren
-function updateTardocDisplay() {
-    const tardocList = document.getElementById('tardocList');
-    const totalPointsElement = document.getElementById('totalPoints');
+// ===== ALLE DISPLAYS AKTUALISIEREN =====
+function updateAllDisplays() {
+    updateProgressIndicators();
+    updateAA05Status();
+    updateCompletenessBar();
+}
+
+// ===== FORTSCHRITTS-INDIKATOREN AKTUALISIEREN =====
+function updateProgressIndicators() {
+    Object.keys(categoryProgress).forEach(category => {
+        const indicator = document.querySelector(`.progress-indicator[data-category="${category}"]`);
+        if (indicator) {
+            const count = categoryProgress[category];
+            const total = REQUIREMENTS[category].total;
+            indicator.textContent = `${count}/${total}`;
+            
+            // Farbe ändern basierend auf Erfüllung
+            if (count >= REQUIREMENTS[category].min) {
+                indicator.style.background = '#2ecc71';
+                indicator.style.color = 'white';
+            } else {
+                indicator.style.background = '#ecf0f1';
+                indicator.style.color = '#7f8c8d';
+            }
+        }
+    });
+}
+
+// ===== AA.05.0130 STATUS AKTUALISIEREN =====
+function updateAA05Status() {
+    const requirements = checkAA05Requirements();
+    const trafficLight = document.getElementById('trafficLight');
+    const aaStatus = document.getElementById('aaStatus');
+    const requirementsList = document.getElementById('requirementsList');
+    const totalPoints = document.getElementById('totalPoints');
+    const multiplierInfo = document.getElementById('multiplierInfo');
+    const multiplierText = document.getElementById('multiplierText');
     
-    // Liste leeren
-    tardocList.innerHTML = '';
+    // Requirements Liste aktualisieren
+    requirementsList.innerHTML = '';
+    let allMet = true;
     
-    if (selectedCodes.size === 0) {
-        tardocList.innerHTML = '<p class="empty-state">Keine Untersuchungen ausgewählt</p>';
-        totalPointsElement.textContent = '0.00';
-        return;
-    }
-    
-    let totalPoints = 0;
-    
-    // TARDOC-Items erstellen
-    selectedCodes.forEach(code => {
-        const checkbox = document.querySelector(`input[data-tardoc="${code}"]`);
-        const points = parseFloat(checkbox.dataset.points);
-        const description = tardocDatabase[code] || 'Keine Beschreibung';
-        
-        totalPoints += points;
+    Object.keys(requirements).forEach(key => {
+        const req = requirements[key];
+        const isMet = req.current >= req.required;
+        if (!isMet) allMet = false;
         
         const item = document.createElement('div');
-        item.className = 'tardoc-item';
+        item.className = `requirement-item ${isMet ? 'complete' : 'incomplete'}`;
         item.innerHTML = `
-            <div class="tardoc-code">${code}</div>
-            <div class="tardoc-description">${description}</div>
-            <div class="tardoc-points">💰 ${points.toFixed(2)} TP</div>
+            <span class="requirement-label">${getCategoryLabel(key)}:</span>
+            <span class="requirement-value">${req.current}/${req.required}</span>
+            <span class="requirement-icon">${isMet ? '✅' : '❌'}</span>
         `;
-        
-        tardocList.appendChild(item);
+        requirementsList.appendChild(item);
     });
     
-    // Gesamtsumme aktualisieren
-    totalPointsElement.textContent = totalPoints.toFixed(2);
-}
-
-// Ampelsystem aktualisieren
-function updateTrafficLight() {
-    const percentage = totalCheckboxes > 0 ? (checkedCheckboxes / totalCheckboxes) * 100 : 0;
-    
-    const redLight = document.getElementById('lightRed');
-    const yellowLight = document.getElementById('lightYellow');
-    const greenLight = document.getElementById('lightGreen');
-    const statusText = document.getElementById('statusText');
-    const completionInfo = document.getElementById('completionInfo');
-    
-    // Alle Lichter ausschalten
-    redLight.classList.remove('active');
-    yellowLight.classList.remove('active');
-    greenLight.classList.remove('active');
-    
-    // Status basierend auf Prozentsatz
-    if (percentage < 50) {
-        redLight.classList.add('active');
-        statusText.textContent = '🔴 Unvollständig - Weitere Untersuchungen erforderlich';
-        statusText.style.color = '#dc3545';
-    } else if (percentage < 80) {
-        yellowLight.classList.add('active');
-        statusText.textContent = '🟡 Teilweise erfüllt - Weitere Untersuchungen empfohlen';
-        statusText.style.color = '#ffc107';
+    // Ampel und Status aktualisieren
+    if (allMet) {
+        trafficLight.className = 'traffic-light green';
+        aaStatus.innerHTML = `
+            <strong>✅ ABRECHENBAR</strong>
+            <p>Mindestanforderungen erfüllt</p>
+        `;
+        
+        // Taxpunkte anzeigen
+        totalPoints.textContent = `${AA05_0130_POINTS.toFixed(2)} TP`;
+        multiplierInfo.style.display = 'block';
+        multiplierText.textContent = '1× AA.05.0130';
     } else {
-        greenLight.classList.add('active');
-        statusText.textContent = '🟢 Vollständig - Alle Anforderungen erfüllt';
-        statusText.style.color = '#28a745';
+        trafficLight.className = 'traffic-light red';
+        aaStatus.innerHTML = `
+            <strong>❌ NICHT abrechenbar</strong>
+            <p>Mindestanforderungen nicht erfüllt</p>
+        `;
+        
+        totalPoints.textContent = '0.00 TP';
+        multiplierInfo.style.display = 'none';
     }
-    
-    // Completion Info aktualisieren
-    completionInfo.textContent = `${checkedCheckboxes} von ${totalCheckboxes} Untersuchungen durchgeführt (${Math.round(percentage)}%)`;
 }
 
-// Drucken
-function handlePrint() {
-    // Druckansicht vorbereiten
-    const printContent = generatePrintContent();
+// ===== AA.05.0130 REQUIREMENTS PRÜFEN =====
+function checkAA05Requirements() {
+    return {
+        vigilanz: {
+            current: categoryProgress.vigilanz,
+            required: REQUIREMENTS.vigilanz.min
+        },
+        hirnnerven: {
+            current: categoryProgress.hirnnerven,
+            required: REQUIREMENTS.hirnnerven.min
+        },
+        motorik: {
+            current: categoryProgress.motorik,
+            required: REQUIREMENTS.motorik.min
+        },
+        sensibilitaet: {
+            current: categoryProgress.sensibilitaet,
+            required: REQUIREMENTS.sensibilitaet.min
+        },
+        reflexe: {
+            current: categoryProgress.reflexe,
+            required: REQUIREMENTS.reflexe.min
+        }
+    };
+}
+
+// ===== KATEGORIE-LABEL HOLEN =====
+function getCategoryLabel(key) {
+    const labels = {
+        vigilanz: 'Vigilanz',
+        hirnnerven: 'Hirnnerven',
+        motorik: 'Motorik',
+        sensibilitaet: 'Sensibilität',
+        reflexe: 'Reflexe'
+    };
+    return labels[key] || key;
+}
+
+// ===== VOLLSTÄNDIGKEITSBALKEN AKTUALISIEREN =====
+function updateCompletenessBar() {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
     
-    // Neues Fenster für Druck
-    const printWindow = window.open('', '', 'width=800,height=600');
+    const percentage = Math.round((totalChecked / totalCheckboxes) * 100);
+    
+    progressBar.style.width = `${percentage}%`;
+    progressText.textContent = `${totalChecked} von ${totalCheckboxes} Untersuchungen durchgeführt (${percentage}%)`;
+}
+
+// ===== DRUCKEN =====
+function handlePrint() {
+    const printContent = generatePrintContent();
+    const printWindow = window.open('', '', 'height=800,width=1000');
+    
     printWindow.document.write(printContent);
     printWindow.document.close();
     printWindow.focus();
     
-    // Kurze Verzögerung, dann Druckdialog
     setTimeout(() => {
         printWindow.print();
         printWindow.close();
     }, 250);
 }
 
-// Druckinhalt generieren
+// ===== PRINT CONTENT GENERIEREN =====
 function generatePrintContent() {
-    const today = new Date().toLocaleDateString('de-CH', {
+    const today = new Date().toLocaleDateString('de-DE', {
+        weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -192,76 +236,159 @@ function generatePrintContent() {
         <html lang="de">
         <head>
             <meta charset="UTF-8">
-            <title>Neurostatus Dokumentation</title>
+            <title>Neurologische Untersuchung - ${today}</title>
             <style>
-                body { font-family: Arial, sans-serif; padding: 20px; }
-                h1 { color: #2c3e50; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-                h2 { color: #34495e; margin-top: 25px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
-                .info { background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-                .section { margin-bottom: 30px; page-break-inside: avoid; }
-                .checked-item { margin: 8px 0; padding: 8px; background: #e8f4f8; border-left: 3px solid #667eea; }
-                .notes { background: #fff3cd; padding: 10px; margin-top: 10px; border-radius: 5px; }
-                .notes-label { font-weight: bold; margin-bottom: 5px; }
-                .tardoc-summary { margin-top: 30px; padding: 15px; background: #d4edda; border-radius: 5px; }
-                .empty { color: #999; font-style: italic; }
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 30px;
+                    line-height: 1.6;
+                }
+                h1 {
+                    color: #2c3e50;
+                    border-bottom: 3px solid #3498db;
+                    padding-bottom: 10px;
+                }
+                h2 {
+                    color: #34495e;
+                    margin-top: 25px;
+                    margin-bottom: 15px;
+                }
+                .header-info {
+                    background: #ecf0f1;
+                    padding: 15px;
+                    border-radius: 5px;
+                    margin-bottom: 20px;
+                }
+                .examination-section {
+                    margin-bottom: 25px;
+                    page-break-inside: avoid;
+                }
+                .checkbox-item {
+                    padding: 8px 0;
+                    padding-left: 25px;
+                }
+                .checkbox-item:before {
+                    content: "✓";
+                    margin-left: -25px;
+                    margin-right: 10px;
+                    color: #2ecc71;
+                    font-weight: bold;
+                }
+                .notes {
+                    background: #f8f9fa;
+                    padding: 15px;
+                    border-left: 4px solid #3498db;
+                    margin-top: 10px;
+                    font-style: italic;
+                }
+                .notes-label {
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                }
+                .aa-status {
+                    background: #d5f4e6;
+                    border: 2px solid #2ecc71;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin: 20px 0;
+                }
+                .aa-status.incomplete {
+                    background: #fadbd8;
+                    border-color: #e74c3c;
+                }
+                .aa-status h3 {
+                    margin-top: 0;
+                    color: #2c3e50;
+                }
+                .requirement-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 10px;
+                    margin-top: 15px;
+                }
+                .requirement-item {
+                    padding: 8px;
+                    background: white;
+                    border-radius: 5px;
+                }
+                @media print {
+                    body { padding: 15px; }
+                    .examination-section { page-break-inside: avoid; }
+                }
             </style>
         </head>
         <body>
             <h1>🧠 Neurologische Untersuchung - Hirnstatus</h1>
-            <div class="info">
+            <div class="header-info">
                 <strong>Datum:</strong> ${today}<br>
-                <strong>Durchgeführte Untersuchungen:</strong> ${checkedCheckboxes} von ${totalCheckboxes}
+                <strong>TARDOC-Code:</strong> AA.05.0130 - Neurologische Untersuchung (Hirnstatus)
             </div>
     `;
     
-    // Alle Untersuchungsgruppen durchgehen
-    const groups = document.querySelectorAll('.examination-group');
-    groups.forEach(group => {
-        const title = group.querySelector('h2').textContent;
-        const checkboxes = group.querySelectorAll('input[type="checkbox"]:checked');
-        const notesField = group.querySelector('textarea');
-        
-        html += `<div class="section"><h2>${title}</h2>`;
-        
-        if (checkboxes.length > 0) {
-            checkboxes.forEach(checkbox => {
-                const label = checkbox.nextElementSibling.textContent;
-                const tardocCode = checkbox.dataset.tardoc;
-                const points = checkbox.dataset.points;
-                html += `<div class="checked-item">✓ ${label} <em>(${tardocCode} - ${points} TP)</em></div>`;
-            });
-        } else {
-            html += `<p class="empty">Keine Untersuchungen durchgeführt</p>`;
+    // AA.05.0130 Status
+    const requirements = checkAA05Requirements();
+    let allMet = true;
+    Object.keys(requirements).forEach(key => {
+        if (requirements[key].current < requirements[key].required) {
+            allMet = false;
         }
-        
-        // Bemerkungen hinzufügen
-        if (notesField && notesField.value.trim()) {
-            html += `<div class="notes"><div class="notes-label">Bemerkungen:</div>${notesField.value}</div>`;
-        }
-        
-        html += `</div>`;
     });
     
-    // TARDOC-Zusammenfassung
-    if (selectedCodes.size > 0) {
-        const totalPoints = Array.from(selectedCodes).reduce((sum, code) => {
-            const checkbox = document.querySelector(`input[data-tardoc="${code}"]`);
-            return sum + parseFloat(checkbox.dataset.points);
-        }, 0);
-        
+    html += `
+        <div class="aa-status ${allMet ? '' : 'incomplete'}">
+            <h3>${allMet ? '✅ ABRECHENBAR' : '❌ NICHT ABRECHENBAR'}</h3>
+            <strong>Status:</strong> ${allMet ? 'Mindestanforderungen erfüllt' : 'Mindestanforderungen nicht erfüllt'}<br>
+            ${allMet ? `<strong>Taxpunkte:</strong> ${AA05_0130_POINTS.toFixed(2)} TP (1× AA.05.0130)` : ''}
+            
+            <div class="requirement-grid">
+    `;
+    
+    Object.keys(requirements).forEach(key => {
+        const req = requirements[key];
+        const isMet = req.current >= req.required;
         html += `
-            <div class="tardoc-summary">
-                <h2>TARDOC-Zusammenfassung</h2>
-                <strong>Gesamt Taxpunkte: ${totalPoints.toFixed(2)} TP</strong><br><br>
-                <strong>Verwendete Codes:</strong><br>
+            <div class="requirement-item">
+                ${isMet ? '✅' : '❌'} <strong>${getCategoryLabel(key)}:</strong> ${req.current}/${req.required}
+            </div>
         `;
-        
-        selectedCodes.forEach(code => {
-            html += `${code}, `;
-        });
-        
-        html += `</div>`;
-    }
+    });
+    
+    html += `
+            </div>
+        </div>
+    `;
+    
+    // Durchgeführte Untersuchungen
+    const categories = ['vigilanz', 'hirnnerven', 'motorik', 'sensibilitaet', 'reflexe'];
+    const categoryTitles = {
+        vigilanz: '0. Vigilanz und Bewusstsein',
+        hirnnerven: '1. Hirnnerven',
+        motorik: '2. Motorik',
+        sensibilitaet: '3. Sensibilität',
+        reflexe: '4. Reflexe'
+    };
+    
+    categories.forEach(category => {
+        const checkboxes = document.querySelectorAll(`input[data-category="${category}"]:checked`);
+        if (checkboxes.length > 0) {
+            html += `<div class="examination-section">`;
+            html += `<h2>${categoryTitles[category]}</h2>`;
+            
+            checkboxes.forEach(checkbox => {
+                const label = checkbox.parentElement.querySelector('span:first-of-type');
+                html += `<div class="checkbox-item">${label.textContent}</div>`;
+            });
+            
+            // Bemerkungen hinzufügen
+            const notesId = `notes-${category}`;
+            const notesField = document.getElementById(notesId);
+            if (notesField && notesField.value.trim()) {
+                html += `<div class="notes"><div class="notes-label">Bemerkungen:</div>${notesField.value}</div>`;
+            }
+            
+            html += `</div>`;
+        }
+    });
     
     html += `
         </body>
@@ -271,21 +398,26 @@ function generatePrintContent() {
     return html;
 }
 
-// Zurücksetzen
+// ===== ZURÜCKSETZEN =====
 function handleReset() {
     if (confirm('Möchten Sie wirklich alle Eingaben zurücksetzen?')) {
         // Alle Checkboxen deaktivieren
-        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
         
         // Alle Textfelder leeren
-        document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+        document.querySelectorAll('textarea').forEach(ta => {
+            ta.value = '';
+        });
         
         // State zurücksetzen
-        selectedCodes.clear();
-        checkedCheckboxes = 0;
+        Object.keys(categoryProgress).forEach(key => {
+            categoryProgress[key] = 0;
+        });
+        totalChecked = 0;
         
-        // Display aktualisieren
-        updateTardocDisplay();
-        updateTrafficLight();
+        // Displays aktualisieren
+        updateAllDisplays();
     }
 }
