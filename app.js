@@ -1,15 +1,21 @@
-// ===== KONFIGURATION =====
+// =====================================================
+// KONSTANTEN & KONFIGURATION
+// =====================================================
+
 const AA05_0130_POINTS = 25.69;
 
 const REQUIREMENTS = {
-    vigilanz: { min: 1, total: 3 },
-    hirnnerven: { min: 6, total: 12 },
-    motorik: { min: 5, total: 5 },
-    sensibilitaet: { min: 1, total: 3 },
-    reflexe: { min: 3, total: 7 }
+    vigilanz: { min: 1, total: 3, label: 'Vigilanz' },
+    hirnnerven: { min: 6, total: 12, label: 'Hirnnerven' },
+    motorik: { min: 5, total: 5, label: 'Motorik' },
+    sensibilitaet: { min: 1, total: 3, label: 'Sensibilität' },
+    reflexe: { min: 3, total: 7, label: 'Reflexe' }
 };
 
-// ===== STATE =====
+// =====================================================
+// STATE MANAGEMENT
+// =====================================================
+
 let categoryProgress = {
     vigilanz: 0,
     hirnnerven: 0,
@@ -19,405 +25,348 @@ let categoryProgress = {
 };
 
 let totalChecked = 0;
-const totalCheckboxes = 30;
+const TOTAL_CHECKBOXES = 30;
 
-// ===== INITIALISIERUNG =====
+// =====================================================
+// INITIALISIERUNG
+// =====================================================
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Datum anzeigen
-    displayCurrentDate();
-    
-    // Event Listeners
-    setupEventListeners();
-    
-    // Initiale Anzeige aktualisieren
+    initializeDateDisplay();
+    setupCheckboxListeners();
     updateAllDisplays();
 });
 
-// ===== DATUM ANZEIGEN =====
-function displayCurrentDate() {
+function initializeDateDisplay() {
     const dateElement = document.getElementById('currentDate');
-    const today = new Date();
+    const now = new Date();
     const options = { 
         weekday: 'long', 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
     };
-    dateElement.textContent = today.toLocaleDateString('de-DE', options);
+    dateElement.textContent = now.toLocaleDateString('de-DE', options);
 }
 
-// ===== EVENT LISTENERS SETUP =====
-function setupEventListeners() {
-    // Alle Checkboxen
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', handleCheckboxChange);
+// =====================================================
+// CHECKBOX-LISTENER
+// =====================================================
+
+function setupCheckboxListeners() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const category = this.dataset.category;
+            
+            if (this.checked) {
+                categoryProgress[category]++;
+                totalChecked++;
+            } else {
+                categoryProgress[category]--;
+                totalChecked--;
+            }
+            
+            updateAllDisplays();
+        });
     });
-    
-    // Buttons
-    document.getElementById('printBtn').addEventListener('click', handlePrint);
-    document.getElementById('resetBtn').addEventListener('click', handleReset);
 }
 
-// ===== CHECKBOX CHANGE HANDLER =====
-function handleCheckboxChange(event) {
-    const checkbox = event.target;
-    const category = checkbox.dataset.category;
-    
-    // Kategorie-Zähler aktualisieren
-    if (checkbox.checked) {
-        categoryProgress[category]++;
-        totalChecked++;
-    } else {
-        categoryProgress[category]--;
-        totalChecked--;
-    }
-    
-    // Displays aktualisieren
-    updateAllDisplays();
-}
+// =====================================================
+// DISPLAY-UPDATES
+// =====================================================
 
-// ===== ALLE DISPLAYS AKTUALISIEREN =====
 function updateAllDisplays() {
-    updateProgressIndicators();
-    updateAA05Status();
+    updateCategoryIndicators();
+    updateRequirementsList();
+    updateStatusLight();
     updateCompletenessBar();
 }
 
-// ===== FORTSCHRITTS-INDIKATOREN AKTUALISIEREN =====
-function updateProgressIndicators() {
-    Object.keys(categoryProgress).forEach(category => {
-        const indicator = document.querySelector(`.progress-indicator[data-category="${category}"]`);
-        if (indicator) {
-            const count = categoryProgress[category];
-            const total = REQUIREMENTS[category].total;
-            indicator.textContent = `${count}/${total}`;
-            
-            // Farbe ändern basierend auf Erfüllung
-            if (count >= REQUIREMENTS[category].min) {
-                indicator.style.background = '#2ecc71';
-                indicator.style.color = 'white';
-            } else {
-                indicator.style.background = '#ecf0f1';
-                indicator.style.color = '#7f8c8d';
-            }
+function updateCategoryIndicators() {
+    document.querySelectorAll('.progress-indicator').forEach(indicator => {
+        const category = indicator.dataset.category;
+        const count = categoryProgress[category];
+        const total = REQUIREMENTS[category].total;
+        indicator.textContent = `${count}/${total}`;
+        
+        // Farbcodierung
+        if (count >= REQUIREMENTS[category].min) {
+            indicator.style.background = '#d4edda';
+            indicator.style.color = '#155724';
+            indicator.style.borderColor = '#c3e6cb';
+        } else {
+            indicator.style.background = 'white';
+            indicator.style.color = '#7f8c8d';
+            indicator.style.borderColor = '#bdc3c7';
         }
     });
 }
 
-// ===== AA.05.0130 STATUS AKTUALISIEREN =====
-function updateAA05Status() {
-    const requirements = checkAA05Requirements();
-    const trafficLight = document.getElementById('trafficLight');
-    const aaStatus = document.getElementById('aaStatus');
-    const requirementsList = document.getElementById('requirementsList');
-    const totalPoints = document.getElementById('totalPoints');
-    const multiplierInfo = document.getElementById('multiplierInfo');
-    const multiplierText = document.getElementById('multiplierText');
-    
-    // Requirements Liste aktualisieren
-    requirementsList.innerHTML = '';
-    let allMet = true;
-    
-    Object.keys(requirements).forEach(key => {
-        const req = requirements[key];
-        const isMet = req.current >= req.required;
-        if (!isMet) allMet = false;
+function updateRequirementsList() {
+    Object.keys(REQUIREMENTS).forEach(category => {
+        const reqItem = document.querySelector(`.req-item[data-req="${category}"]`);
+        const icon = reqItem.querySelector('.req-icon');
+        const text = reqItem.querySelector('.req-text');
+        const count = categoryProgress[category];
+        const req = REQUIREMENTS[category];
         
-        const item = document.createElement('div');
-        item.className = `requirement-item ${isMet ? 'complete' : 'incomplete'}`;
-        item.innerHTML = `
-            <span class="requirement-label">${getCategoryLabel(key)}:</span>
-            <span class="requirement-value">${req.current}/${req.required}</span>
-            <span class="requirement-icon">${isMet ? '✅' : '❌'}</span>
-        `;
-        requirementsList.appendChild(item);
+        text.innerHTML = `${req.label}: <strong>${count}/${req.min}</strong>`;
+        
+        if (count >= req.min) {
+            reqItem.classList.add('met');
+            reqItem.classList.remove('not-met');
+            icon.textContent = '✅';
+        } else {
+            reqItem.classList.add('not-met');
+            reqItem.classList.remove('met');
+            icon.textContent = '❌';
+        }
     });
+}
+
+function updateStatusLight() {
+    const allMet = checkAllRequirementsMet();
+    const statusLight = document.getElementById('statusLight');
+    const statusText = document.getElementById('statusText');
+    const taxpunkteValue = document.getElementById('taxpunkteValue');
     
-    // Ampel und Status aktualisieren
     if (allMet) {
-        trafficLight.className = 'traffic-light green';
-        aaStatus.innerHTML = `
-            <strong>✅ ABRECHENBAR</strong>
-            <p>Mindestanforderungen erfüllt</p>
-        `;
-        
-        // Taxpunkte anzeigen
-        totalPoints.textContent = `${AA05_0130_POINTS.toFixed(2)} TP`;
-        multiplierInfo.style.display = 'block';
-        multiplierText.textContent = '1× AA.05.0130';
+        statusLight.className = 'status-light green';
+        statusText.textContent = 'Abrechenbar';
+        statusText.style.color = '#27ae60';
+        taxpunkteValue.textContent = `${AA05_0130_POINTS.toFixed(2)} TP`;
+        taxpunkteValue.classList.add('active');
     } else {
-        trafficLight.className = 'traffic-light red';
-        aaStatus.innerHTML = `
-            <strong>❌ NICHT abrechenbar</strong>
-            <p>Mindestanforderungen nicht erfüllt</p>
-        `;
-        
-        totalPoints.textContent = '0.00 TP';
-        multiplierInfo.style.display = 'none';
+        statusLight.className = 'status-light red';
+        statusText.textContent = 'Nicht abrechenbar';
+        statusText.style.color = '#e74c3c';
+        taxpunkteValue.textContent = '0.00 TP';
+        taxpunkteValue.classList.remove('active');
     }
 }
 
-// ===== AA.05.0130 REQUIREMENTS PRÜFEN =====
-function checkAA05Requirements() {
-    return {
-        vigilanz: {
-            current: categoryProgress.vigilanz,
-            required: REQUIREMENTS.vigilanz.min
-        },
-        hirnnerven: {
-            current: categoryProgress.hirnnerven,
-            required: REQUIREMENTS.hirnnerven.min
-        },
-        motorik: {
-            current: categoryProgress.motorik,
-            required: REQUIREMENTS.motorik.min
-        },
-        sensibilitaet: {
-            current: categoryProgress.sensibilitaet,
-            required: REQUIREMENTS.sensibilitaet.min
-        },
-        reflexe: {
-            current: categoryProgress.reflexe,
-            required: REQUIREMENTS.reflexe.min
-        }
-    };
-}
-
-// ===== KATEGORIE-LABEL HOLEN =====
-function getCategoryLabel(key) {
-    const labels = {
-        vigilanz: 'Vigilanz',
-        hirnnerven: 'Hirnnerven',
-        motorik: 'Motorik',
-        sensibilitaet: 'Sensibilität',
-        reflexe: 'Reflexe'
-    };
-    return labels[key] || key;
-}
-
-// ===== VOLLSTÄNDIGKEITSBALKEN AKTUALISIEREN =====
 function updateCompletenessBar() {
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
+    const percentage = (totalChecked / TOTAL_CHECKBOXES) * 100;
+    const progressFill = document.getElementById('progressFill');
+    const completenessPercent = document.getElementById('completenessPercent');
+    const completenessCount = document.getElementById('completenessCount');
     
-    const percentage = Math.round((totalChecked / totalCheckboxes) * 100);
-    
-    progressBar.style.width = `${percentage}%`;
-    progressText.textContent = `${totalChecked} von ${totalCheckboxes} Untersuchungen durchgeführt (${percentage}%)`;
+    progressFill.style.width = `${percentage}%`;
+    completenessPercent.textContent = `${Math.round(percentage)}%`;
+    completenessCount.textContent = `${totalChecked}/${TOTAL_CHECKBOXES} Punkte`;
 }
 
-// ===== DRUCKEN =====
+// =====================================================
+// ANFORDERUNGSPRÜFUNG
+// =====================================================
+
+function checkAllRequirementsMet() {
+    return Object.keys(REQUIREMENTS).every(category => {
+        return categoryProgress[category] >= REQUIREMENTS[category].min;
+    });
+}
+
+// =====================================================
+// DRUCK-FUNKTIONALITÄT
+// =====================================================
+
 function handlePrint() {
-    const printContent = generatePrintContent();
-    const printWindow = window.open('', '', 'height=800,width=1000');
-    
-    printWindow.document.write(printContent);
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(generatePrintContent());
     printWindow.document.close();
-    printWindow.focus();
     
     setTimeout(() => {
         printWindow.print();
-        printWindow.close();
-    }, 250);
+    }, 500);
 }
 
-// ===== PRINT CONTENT GENERIEREN =====
 function generatePrintContent() {
-    const today = new Date().toLocaleDateString('de-DE', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+    const allMet = checkAllRequirementsMet();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('de-DE', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
     });
     
     let html = `
-        <!DOCTYPE html>
-        <html lang="de">
-        <head>
-            <meta charset="UTF-8">
-            <title>Neurologische Untersuchung - ${today}</title>
-            <style>
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+        <meta charset="UTF-8">
+        <title>Neurostatus - ${dateStr}</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 40px 20px;
+                color: #2c3e50;
+            }
+            
+            .print-header {
+                text-align: center;
+                border-bottom: 3px solid #2c3e50;
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+            }
+            
+            .print-header h1 {
+                font-size: 24px;
+                margin-bottom: 10px;
+                color: #2c3e50;
+            }
+            
+            .print-header .date {
+                font-size: 14px;
+                color: #7f8c8d;
+            }
+            
+            .pdf-info {
+                padding: 15px 0;
+                border-bottom: 2px solid #34495e;
+                margin-bottom: 25px;
+            }
+            
+            .pdf-info p {
+                margin: 5px 0;
+                font-size: 14px;
+            }
+            
+            .section {
+                margin-bottom: 25px;
+                page-break-inside: avoid;
+            }
+            
+            .section h2 {
+                font-size: 16px;
+                color: #2c3e50;
+                border-bottom: 2px solid #ecf0f1;
+                padding-bottom: 8px;
+                margin-bottom: 12px;
+            }
+            
+            .item-list {
+                list-style: none;
+                padding-left: 0;
+            }
+            
+            .item-list li {
+                padding: 6px 0;
+                padding-left: 25px;
+                position: relative;
+            }
+            
+            .item-list li:before {
+                content: '✓';
+                position: absolute;
+                left: 0;
+                color: #27ae60;
+                font-weight: bold;
+            }
+            
+            .remarks-box {
+                background: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                padding: 15px;
+                margin-top: 10px;
+                white-space: pre-wrap;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+            
+            .empty-note {
+                color: #95a5a6;
+                font-style: italic;
+            }
+            
+            @media print {
                 body {
-                    font-family: Arial, sans-serif;
-                    padding: 30px;
-                    line-height: 1.6;
+                    padding: 20px;
                 }
-                h1 {
-                    color: #2c3e50;
-                    border-bottom: 3px solid #3498db;
-                    padding-bottom: 10px;
-                }
-                h2 {
-                    color: #34495e;
-                    margin-top: 25px;
-                    margin-bottom: 15px;
-                }
-                .header-info {
-                    background: #ecf0f1;
-                    padding: 15px;
-                    border-radius: 5px;
-                    margin-bottom: 20px;
-                }
-                .examination-section {
-                    margin-bottom: 25px;
+                
+                .section {
                     page-break-inside: avoid;
                 }
-                .checkbox-item {
-                    padding: 8px 0;
-                    padding-left: 25px;
-                }
-                .checkbox-item:before {
-                    content: "✓";
-                    margin-left: -25px;
-                    margin-right: 10px;
-                    color: #2ecc71;
-                    font-weight: bold;
-                }
-                .notes {
-                    background: #f8f9fa;
-                    padding: 15px;
-                    border-left: 4px solid #3498db;
-                    margin-top: 10px;
-                    font-style: italic;
-                }
-                .notes-label {
-                    font-weight: bold;
-                    margin-bottom: 5px;
-                }
-                .aa-status {
-                    background: #d5f4e6;
-                    border: 2px solid #2ecc71;
-                    padding: 20px;
-                    border-radius: 8px;
-                    margin: 20px 0;
-                }
-                .aa-status.incomplete {
-                    background: #fadbd8;
-                    border-color: #e74c3c;
-                }
-                .aa-status h3 {
-                    margin-top: 0;
-                    color: #2c3e50;
-                }
-                .requirement-grid {
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 10px;
-                    margin-top: 15px;
-                }
-                .requirement-item {
-                    padding: 8px;
-                    background: white;
-                    border-radius: 5px;
-                }
-                @media print {
-                    body { padding: 15px; }
-                    .examination-section { page-break-inside: avoid; }
-                }
-            </style>
-        </head>
-        <body>
-            <h1>🧠 Neurologische Untersuchung - Hirnstatus</h1>
-            <div class="header-info">
-                <strong>Datum:</strong> ${today}<br>
-                <strong>TARDOC-Code:</strong> AA.05.0130 - Neurologische Untersuchung (Hirnstatus)
-            </div>
-    `;
-    
-    // AA.05.0130 Status
-    const requirements = checkAA05Requirements();
-    let allMet = true;
-    Object.keys(requirements).forEach(key => {
-        if (requirements[key].current < requirements[key].required) {
-            allMet = false;
-        }
-    });
-    
-    html += `
-        <div class="aa-status ${allMet ? '' : 'incomplete'}">
-            <h3>${allMet ? '✅ ABRECHENBAR' : '❌ NICHT ABRECHENBAR'}</h3>
-            <strong>Status:</strong> ${allMet ? 'Mindestanforderungen erfüllt' : 'Mindestanforderungen nicht erfüllt'}<br>
-            ${allMet ? `<strong>Taxpunkte:</strong> ${AA05_0130_POINTS.toFixed(2)} TP (1× AA.05.0130)` : ''}
-            
-            <div class="requirement-grid">
-    `;
-    
-    Object.keys(requirements).forEach(key => {
-        const req = requirements[key];
-        const isMet = req.current >= req.required;
-        html += `
-            <div class="requirement-item">
-                ${isMet ? '✅' : '❌'} <strong>${getCategoryLabel(key)}:</strong> ${req.current}/${req.required}
-            </div>
-        `;
-    });
-    
-    html += `
-            </div>
+            }
+        </style>
+    </head>
+    <body>
+        <div class="print-header">
+            <h1>NEUROLOGISCHE UNTERSUCHUNG - HIRNSTATUS</h1>
+            <div class="date">${dateStr}</div>
+        </div>
+        
+        <div class="pdf-info">
+            <p><strong>TARDOC:</strong> AA.05.0130 - Neurologische Untersuchung (Hirnstatus)</p>
+            ${allMet ? `<p><strong>Taxpunkte:</strong> ${AA05_0130_POINTS.toFixed(2)} TP</p>` : ''}
         </div>
     `;
     
-    // Durchgeführte Untersuchungen
-    const categories = ['vigilanz', 'hirnnerven', 'motorik', 'sensibilitaet', 'reflexe'];
-    const categoryTitles = {
-        vigilanz: '0. Vigilanz und Bewusstsein',
-        hirnnerven: '1. Hirnnerven',
-        motorik: '2. Motorik',
-        sensibilitaet: '3. Sensibilität',
-        reflexe: '4. Reflexe'
-    };
+    // Durchgeführte Untersuchungen nach Kategorien
+    const categories = [
+        { key: 'vigilanz', title: '0. Vigilanz und Bewusstsein' },
+        { key: 'hirnnerven', title: '1. Hirnnerven' },
+        { key: 'motorik', title: '2. Motorik' },
+        { key: 'sensibilitaet', title: '3. Sensibilität' },
+        { key: 'reflexe', title: '4. Reflexe' }
+    ];
     
-    categories.forEach(category => {
-        const checkboxes = document.querySelectorAll(`input[data-category="${category}"]:checked`);
+    categories.forEach(cat => {
+        const checkboxes = document.querySelectorAll(`input[data-category="${cat.key}"]:checked`);
+        
         if (checkboxes.length > 0) {
-            html += `<div class="examination-section">`;
-            html += `<h2>${categoryTitles[category]}</h2>`;
+            html += `<div class="section">`;
+            html += `<h2>${cat.title}</h2>`;
+            html += `<ul class="item-list">`;
             
-            checkboxes.forEach(checkbox => {
-                const label = checkbox.parentElement.querySelector('span:first-of-type');
-                html += `<div class="checkbox-item">${label.textContent}</div>`;
+            checkboxes.forEach(cb => {
+                const label = cb.parentElement.querySelector('span').textContent;
+                html += `<li>${label}</li>`;
             });
             
-            // Bemerkungen hinzufügen
-            const notesId = `notes-${category}`;
-            const notesField = document.getElementById(notesId);
-            if (notesField && notesField.value.trim()) {
-                html += `<div class="notes"><div class="notes-label">Bemerkungen:</div>${notesField.value}</div>`;
-            }
-            
-            html += `</div>`;
+            html += `</ul></div>`;
         }
     });
     
-    html += `
-        </body>
-        </html>
-    `;
+    // Bemerkungen
+    const remarks = document.getElementById('remarks').value.trim();
+    html += `<div class="section">`;
+    html += `<h2>5. Bemerkungen</h2>`;
+    
+    if (remarks) {
+        html += `<div class="remarks-box">${remarks}</div>`;
+    } else {
+        html += `<div class="remarks-box empty-note">Keine Bemerkungen erfasst</div>`;
+    }
+    
+    html += `</div>`;
+    html += `</body></html>`;
     
     return html;
 }
 
-// ===== ZURÜCKSETZEN =====
+// =====================================================
+// RESET-FUNKTIONALITÄT
+// =====================================================
+
 function handleReset() {
     if (confirm('Möchten Sie wirklich alle Eingaben zurücksetzen?')) {
-        // Alle Checkboxen deaktivieren
         document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
             cb.checked = false;
         });
         
-        // Alle Textfelder leeren
         document.querySelectorAll('textarea').forEach(ta => {
             ta.value = '';
         });
         
-        // State zurücksetzen
         Object.keys(categoryProgress).forEach(key => {
             categoryProgress[key] = 0;
         });
         totalChecked = 0;
         
-        // Displays aktualisieren
         updateAllDisplays();
     }
 }
