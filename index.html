@@ -13,7 +13,6 @@
             <h1>🧠 Neurologische Untersuchung - Hirnstatus</h1>
             <div class="header-info">
                 <span id="currentDate"></span>
-                <span class="header-code">TARDOC: AA.05.0130</span>
             </div>
         </header>
 
@@ -32,27 +31,17 @@
                     
                     <div class="checkbox-group">
                         <label>
-                            <input type="checkbox" data-category="vigilanz" data-required="true">
-                            <span>Vigilanzprüfung (wach, somnolent, soporös, komatös)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="vigilanz">
+                            <span>Vigilanzprüfung (Wachheit, Reaktionsfähigkeit)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="vigilanz" data-required="true">
-                            <span>Orientierung (zeitlich, örtlich, situativ, zur Person)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="vigilanz">
+                            <span>Orientierung (Person, Ort, Zeit, Situation)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="vigilanz" data-required="true">
-                            <span>Aufmerksamkeit und Konzentration</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="vigilanz">
+                            <span>Bewusstseinslage (GCS/Koma-Skala)</span>
                         </label>
-                    </div>
-                    
-                    <div class="notes-section">
-                        <label for="notes-vigilanz">Bemerkungen:</label>
-                        <textarea id="notes-vigilanz" rows="2" placeholder="Zusätzliche Bemerkungen zur Vigilanz..."></textarea>
                     </div>
                 </div>
 
@@ -66,81 +55,53 @@
                     
                     <div class="checkbox-group">
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. I - Riechprüfung (Olfactorius)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. I - Riechprüfung (Geruchssinn)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. II - Visus und Gesichtsfeld (Opticus)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. II - Visus und Gesichtsfeld</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. III, IV, VI - Pupillomotorik und Augenbewegungen</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. II - Funduskopie (Augenhintergrund)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. V - Sensibilität Gesicht, Masseterreflex (Trigeminus)</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. III, IV, VI - Pupillomotorik</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. VII - Faziale Motorik (Facialis)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. III, IV, VI - Augenbewegungen</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. VIII - Hörprüfung (Acusticus)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. V - Sensibilität Gesicht</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. IX - Schluckreflex, Würgereflex (Glossopharyngeus)</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. V - Masseterreflex</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. X - Gaumensegel, Stimmbildung (Vagus)</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. VII - Fazialismotorik</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. XI - Kopfdrehung, Schulterhebung (Accessorius)</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. VIII - Hörprüfung (Weber/Rinne)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>N. XII - Zungenmotorik (Hypoglossus)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. IX, X - Gaumensegel, Würgreflex</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>Funduskopie</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. XI - Kopfwendung, Schulterhebung</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="hirnnerven" data-required="true">
-                            <span>Kornealreflex</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="hirnnerven">
+                            <span>N. XII - Zungenmotorik</span>
                         </label>
-                    </div>
-                    
-                    <div class="notes-section">
-                        <label for="notes-hirnnerven">Bemerkungen:</label>
-                        <textarea id="notes-hirnnerven" rows="2" placeholder="Zusätzliche Bemerkungen zu Hirnnerven..."></textarea>
                     </div>
                 </div>
 
@@ -154,39 +115,25 @@
                     
                     <div class="checkbox-group">
                         <label>
-                            <input type="checkbox" data-category="motorik" data-required="true">
-                            <span>Spontanmotorik (Haltung, unwillkürliche Bewegungen)</span>
-                            <span class="badge badge-required">PFLICHT</span>
+                            <input type="checkbox" data-category="motorik">
+                            <span>Spontanmotorik (Bewegungsverhalten in Ruhe)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="motorik" data-required="true">
+                            <input type="checkbox" data-category="motorik">
                             <span>Kraftprüfung obere Extremitäten</span>
-                            <span class="badge badge-required">PFLICHT</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="motorik" data-required="true">
+                            <input type="checkbox" data-category="motorik">
                             <span>Kraftprüfung untere Extremitäten</span>
-                            <span class="badge badge-required">PFLICHT</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="motorik" data-required="true">
-                            <span>Koordination (Finger-Nase, Knie-Hacke, Diadochokinese)</span>
-                            <span class="badge badge-required">PFLICHT</span>
+                            <input type="checkbox" data-category="motorik">
+                            <span>Tonus (Spastik/Rigor)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="motorik" data-required="true">
-                            <span>Gangprüfung (Normal-, Hacken-, Zehengang, Romberg)</span>
-                            <span class="badge badge-required">PFLICHT</span>
+                            <input type="checkbox" data-category="motorik">
+                            <span>Koordination (Finger-Nase/Knie-Hacke)</span>
                         </label>
-                    </div>
-                    
-                    <div class="notes-section">
-                        <label for="notes-motorik">Bemerkungen:</label>
-                        <textarea id="notes-motorik" rows="2" placeholder="Zusätzliche Bemerkungen zur Motorik..."></textarea>
                     </div>
                 </div>
 
@@ -194,33 +141,23 @@
                 <div class="examination-group">
                     <div class="group-header">
                         <h2>3. Sensibilität</h2>
-                        <span class="requirement-badge badge-required">Mind. 1/3 erforderlich</span>
+                        <span class="requirement-badge badge-recommended">Mind. 1/3 erforderlich</span>
                         <span class="progress-indicator" data-category="sensibilitaet">0/3</span>
                     </div>
                     
                     <div class="checkbox-group">
                         <label>
-                            <input type="checkbox" data-category="sensibilitaet" data-required="true">
-                            <span>Oberflächensensibilität (Berührung, Schmerz, Temperatur)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="sensibilitaet">
+                            <span>Oberflächensensibilität (Berührung, Schmerz)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="sensibilitaet" data-required="true">
-                            <span>Tiefensensibilität (Vibration, Lagesinn)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
+                            <input type="checkbox" data-category="sensibilitaet">
+                            <span>Tiefensensibilität (Lagesinn, Vibration)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="sensibilitaet" data-required="true">
-                            <span>Kortikale Sensibilität (Stereognosie, Graphästhesie)</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="sensibilitaet">
+                            <span>Kortikale Sensibilität (Graphästhesie, 2-Punkte-Diskrimination)</span>
                         </label>
-                    </div>
-                    
-                    <div class="notes-section">
-                        <label for="notes-sensibilitaet">Bemerkungen:</label>
-                        <textarea id="notes-sensibilitaet" rows="2" placeholder="Zusätzliche Bemerkungen zur Sensibilität..."></textarea>
                     </div>
                 </div>
 
@@ -228,171 +165,145 @@
                 <div class="examination-group">
                     <div class="group-header">
                         <h2>4. Reflexe</h2>
-                        <span class="requirement-badge badge-required">Mind. 3/7 erforderlich</span>
+                        <span class="requirement-badge badge-recommended">Mind. 3/7 erforderlich</span>
                         <span class="progress-indicator" data-category="reflexe">0/7</span>
                     </div>
                     
                     <div class="checkbox-group">
                         <label>
-                            <input type="checkbox" data-category="reflexe" data-required="true">
+                            <input type="checkbox" data-category="reflexe">
                             <span>Bizepssehnenreflex (BSR)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="reflexe" data-required="true">
+                            <input type="checkbox" data-category="reflexe">
                             <span>Trizepssehnenreflex (TSR)</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="reflexe" data-required="true">
+                            <input type="checkbox" data-category="reflexe">
+                            <span>Radiusperiostreflex (RPR)</span>
+                        </label>
+                        <label>
+                            <input type="checkbox" data-category="reflexe">
                             <span>Patellarsehnenreflex (PSR)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="reflexe" data-required="true">
+                            <input type="checkbox" data-category="reflexe">
                             <span>Achillessehnenreflex (ASR)</span>
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="reflexe" data-required="true">
-                            <span>Bauchhautreflexe</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
+                            <input type="checkbox" data-category="reflexe">
+                            <span>Bauchhautreflex (BHR)</span>
                         </label>
-                        
                         <label>
-                            <input type="checkbox" data-category="reflexe" data-required="true">
-                            <span>Pyramidenzeichen (Babinski, Oppenheim, Gordon)</span>
-                            <span class="badge badge-required">PFLICHT</span>
+                            <input type="checkbox" data-category="reflexe">
+                            <span>Pathologische Reflexe (Babinski, Hoffman, etc.)</span>
                         </label>
-                        
-                        <label>
-                            <input type="checkbox" data-category="reflexe" data-required="true">
-                            <span>Fremdreflexe (Palmomental, Greifreflex)</span>
-                            <span class="badge badge-optional">OPTIONAL</span>
-                        </label>
+                    </div>
+                </div>
+
+                <!-- Bemerkungen -->
+                <div class="examination-group">
+                    <div class="group-header">
+                        <h2>5. Bemerkungen</h2>
+                        <span class="requirement-badge badge-optional">Optional</span>
                     </div>
                     
-                    <div class="notes-section">
-                        <label for="notes-reflexe">Bemerkungen:</label>
-                        <textarea id="notes-reflexe" rows="2" placeholder="Zusätzliche Bemerkungen zu Reflexen..."></textarea>
+                    <textarea 
+                        id="remarks" 
+                        rows="4" 
+                        placeholder="Zusätzliche Befunde, Auffälligkeiten oder Besonderheiten..."
+                    ></textarea>
+                </div>
+
+            </div>
+
+            <!-- Rechte Seite: TARDOC-Übersicht -->
+            <aside class="tardoc-panel">
+                <div class="tardoc-header">
+                    <h3>📋 TARDOC AA.05.0130</h3>
+                    <p class="tardoc-description">Neurologische Untersuchung<br>Hirnstatus</p>
+                </div>
+
+                <!-- Ampel-System -->
+                <div class="status-indicator" id="statusIndicator">
+                    <div class="status-light" id="statusLight"></div>
+                    <div class="status-text" id="statusText">
+                        Nicht abrechenbar
                     </div>
+                </div>
+
+                <!-- Taxpunkte -->
+                <div class="taxpunkte">
+                    <span class="tp-label">Taxpunkte:</span>
+                    <span class="tp-value" id="taxpunkteValue">0.00 TP</span>
+                </div>
+
+                <!-- Mindestanforderungen -->
+                <div class="requirements">
+                    <h4>Mindestanforderungen:</h4>
+                    <ul id="requirementsList">
+                        <li class="req-item" data-req="vigilanz">
+                            <span class="req-icon">⭕</span>
+                            <span class="req-text">Vigilanz: <strong>0/1</strong></span>
+                        </li>
+                        <li class="req-item" data-req="hirnnerven">
+                            <span class="req-icon">⭕</span>
+                            <span class="req-text">Hirnnerven: <strong>0/6</strong></span>
+                        </li>
+                        <li class="req-item" data-req="motorik">
+                            <span class="req-icon">⭕</span>
+                            <span class="req-text">Motorik: <strong>0/5</strong></span>
+                        </li>
+                        <li class="req-item" data-req="sensibilitaet">
+                            <span class="req-icon">⭕</span>
+                            <span class="req-text">Sensibilität: <strong>0/1</strong></span>
+                        </li>
+                        <li class="req-item" data-req="reflexe">
+                            <span class="req-icon">⭕</span>
+                            <span class="req-text">Reflexe: <strong>0/3</strong></span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Vollständigkeitsbalken -->
+                <div class="completeness">
+                    <div class="completeness-header">
+                        <span>Vollständigkeit:</span>
+                        <span id="completenessPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="completeness-count" id="completenessCount">0/30 Punkte</div>
                 </div>
 
                 <!-- Aktionsbuttons -->
                 <div class="action-buttons">
-                    <button id="printBtn" class="btn btn-primary">🖨️ Drucken</button>
-                    <button id="resetBtn" class="btn btn-secondary">🔄 Zurücksetzen</button>
-                </div>
-            </div>
-
-            <!-- Rechte Seite: TARDOC Anzeige -->
-            <div class="tardoc-panel">
-                <!-- AA.05.0130 Status -->
-                <div class="aa-status-section">
-                    <h3>🚦 ABRECHNUNGSFÄHIGKEIT</h3>
-                    <div class="aa-code-header">
-                        <strong>AA.05.0130</strong>
-                        <span class="aa-code-description">Neurologische Untersuchung (Hirnstatus)</span>
-                    </div>
-                    
-                    <div class="traffic-light-container">
-                        <div id="trafficLight" class="traffic-light red">
-                            <div class="light-circle"></div>
-                        </div>
-                        <div id="aaStatus" class="aa-status-text">
-                            <strong>❌ NICHT abrechenbar</strong>
-                            <p>Mindestanforderungen nicht erfüllt</p>
-                        </div>
-                    </div>
-                    
-                    <div class="requirements-detail">
-                        <h4>Fehlende Anforderungen:</h4>
-                        <div id="requirementsList" class="requirements-list">
-                            <div class="requirement-item incomplete">
-                                <span class="requirement-label">Vigilanz:</span>
-                                <span class="requirement-value">0/1</span>
-                                <span class="requirement-icon">❌</span>
-                            </div>
-                            <div class="requirement-item incomplete">
-                                <span class="requirement-label">Hirnnerven:</span>
-                                <span class="requirement-value">0/6</span>
-                                <span class="requirement-icon">❌</span>
-                            </div>
-                            <div class="requirement-item incomplete">
-                                <span class="requirement-label">Motorik:</span>
-                                <span class="requirement-value">0/5</span>
-                                <span class="requirement-icon">❌</span>
-                            </div>
-                            <div class="requirement-item incomplete">
-                                <span class="requirement-label">Sensibilität:</span>
-                                <span class="requirement-value">0/1</span>
-                                <span class="requirement-icon">❌</span>
-                            </div>
-                            <div class="requirement-item incomplete">
-                                <span class="requirement-label">Reflexe:</span>
-                                <span class="requirement-value">0/3</span>
-                                <span class="requirement-icon">❌</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="aa-billing-info">
-                        <div class="billing-line">
-                            <span>💰 Taxpunkte:</span>
-                            <strong id="totalPoints">0.00 TP</strong>
-                        </div>
-                        <div class="billing-multiplier" id="multiplierInfo" style="display: none;">
-                            <span id="multiplierText">1× AA.05.0130</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Vollständigkeits-Indikator -->
-                <div class="completeness-section">
-                    <h4>📊 Vollständigkeit</h4>
-                    <div class="progress-bar-container">
-                        <div id="progressBar" class="progress-bar" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-text">
-                        <span id="progressText">0 von 30 Untersuchungen durchgeführt (0%)</span>
-                    </div>
+                    <button class="btn-primary" onclick="handlePrint()">
+                        🖨️ Drucken / PDF
+                    </button>
+                    <button class="btn-secondary" onclick="handleReset()">
+                        🔄 Zurücksetzen
+                    </button>
                 </div>
 
                 <!-- Legende -->
-                <div class="legend-section">
-                    <h4>ℹ️ Legende</h4>
-                    <div class="legend-items">
-                        <div class="legend-item">
-                            <span class="badge badge-required">PFLICHT</span>
-                            <span>Muss durchgeführt werden</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="badge badge-recommended">EMPFOHLEN</span>
-                            <span>Teil der Mindestanforderungen</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="badge badge-optional">OPTIONAL</span>
-                            <span>Zusätzliche Untersuchung</span>
-                        </div>
+                <div class="legend">
+                    <h4>Legende:</h4>
+                    <div class="legend-item">
+                        <span class="badge-required">PFLICHT</span>
+                        <span>Muss erfüllt sein</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="badge-recommended">EMPFOHLEN</span>
+                        <span>Sollte erfüllt sein</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="badge-optional">OPTIONAL</span>
+                        <span>Kann dokumentiert werden</span>
                     </div>
                 </div>
-
-                <!-- Hilfe -->
-                <div class="help-section">
-                    <h4>💡 Mindestanforderungen AA.05.0130</h4>
-                    <ul class="help-list">
-                        <li>Mind. 1 Vigilanzprüfung</li>
-                        <li>Mind. 6 von 12 Hirnnerven</li>
-                        <li>ALLE 5 Motorik-Untersuchungen</li>
-                        <li>Mind. 1 Sensibilitätsprüfung</li>
-                        <li>Mind. 3 Reflexprüfungen (inkl. Babinski)</li>
-                    </ul>
-                </div>
-            </div>
+            </aside>
         </div>
     </div>
 
