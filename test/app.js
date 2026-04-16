@@ -1,24 +1,21 @@
 // ============================================
-// TARDOC KONFIGURATION
+// TARDOC KONFIGURATION – KATEGORIE-BASIERT
 // ============================================
 const CATEGORIES = {
-    vigilanz:      { label: 'Vigilanz / Bewusstsein', total: 3 },
-    hirnnerven:    { label: 'Hirnnerven', total: 13 },
-    motorik:       { label: 'Motorik / Tonus', total: 4 },
-    kraft:         { label: 'Muskelkraft', total: 6 },
-    sensibilitaet: { label: 'Sensibilität', total: 4 },
-    koordination:  { label: 'Koordination', total: 4 },
-    gang:          { label: 'Gangbild / Stand', total: 4 },
-    reflexe:       { label: 'Reflexe', total: 6 },
-    pyramiden:     { label: 'Pyramidenbahnzeichen', total: 3 },
-    meningeal:     { label: 'Meningeale Zeichen', total: 3 }
+    vigilanz:      { label: 'Vigilanz',              total: 3,  minRequired: 1 },
+    hirnnerven:    { label: 'Hirnnerven (6/12)',      total: 13, minRequired: 6 },
+    motorik:       { label: 'Spontanmotorik / Tonus', total: 4,  minRequired: 1 },
+    kraft:         { label: 'Muskelkraft',            total: 6,  minRequired: 1 },
+    sensibilitaet: { label: 'Sensibilität',           total: 4,  minRequired: 1 },
+    koordination:  { label: 'Koordination',           total: 4,  minRequired: 1 },
+    gang:          { label: 'Gangbild / Stand',       total: 4,  minRequired: 1 },
+    reflexe:       { label: 'Muskeleigenreflexe',     total: 6,  minRequired: 1 },
+    pyramiden:     { label: 'Pyramidenzeichen',       total: 3,  minRequired: 1 },
+    meningeal:     { label: 'Meningeale Zeichen',     total: 3,  minRequired: 0 }
 };
 
-const TARDOC_THRESHOLDS = [
-    { min: 1,  max: 10, code: 'AA.05.01', label: 'Kurzstatus (1–10 Items)' },
-    { min: 11, max: 25, code: 'AA.05.02', label: 'Teilstatus (11–25 Items)' },
-    { min: 26, max: 50, code: 'AA.05.03', label: 'Vollstatus (26–50 Items)' },
-];
+// Pflicht-Kategorien für Vollstatus (alle ausser meningeal)
+const REQUIRED_CATS = ['vigilanz','hirnnerven','motorik','kraft','sensibilitaet','koordination','gang','reflexe','pyramiden'];
 
 // ============================================
 // STATE
@@ -33,21 +30,26 @@ document.addEventListener('DOMContentLoaded', () => {
     buildTardocRows();
     attachCheckboxListeners();
     updateAll();
-    // Erste Sektion öffnen
     const firstBody = document.querySelector('.section-body');
     if (firstBody) firstBody.classList.add('open');
 });
 
 // ============================================
-// TARDOC SIDEBAR AUFBAUEN
+// TARDOC SIDEBAR
 // ============================================
 function buildTardocRows() {
     const container = document.getElementById('tardocRows');
     container.innerHTML = '';
     Object.keys(CATEGORIES).forEach(cat => {
+        const cfg = CATEGORIES[cat];
         const row = document.createElement('div');
         row.className = 'tardoc-row';
-        row.innerHTML = `<span>${CATEGORIES[cat].label}</span><span class="count" id="tr-${cat}">0</span>`;
+        row.id = `trow-${cat}`;
+        row.innerHTML = `
+            <span class="tr-status" id="ts-${cat}">○</span>
+            <span class="tr-label">${cfg.label}</span>
+            <span class="tr-count" id="tr-${cat}">0/${cfg.minRequired > 0 ? cfg.minRequired : '–'}</span>
+        `;
         container.appendChild(row);
     });
 }
@@ -82,84 +84,121 @@ function recount() {
 }
 
 // ============================================
-// ALLE DISPLAYS AKTUALISIEREN
+// ALLES AKTUALISIEREN
 // ============================================
 function updateAll() {
-    let total = 0;
+    let fulfilledCount = 0;
+    let totalChecked = 0;
 
     Object.keys(CATEGORIES).forEach(cat => {
+        const cfg = CATEGORIES[cat];
         const c = counts[cat];
-        const t = CATEGORIES[cat].total;
-        total += c;
+        totalChecked += c;
 
-        // Sidebar Zahl
-        const el = document.getElementById(`tr-${cat}`);
-        if (el) el.textContent = c;
+        const isFulfilled = cfg.minRequired > 0 && c >= cfg.minRequired;
+        const isPartial = cfg.minRequired > 0 && c > 0 && c < cfg.minRequired;
+        const isOptional = cfg.minRequired === 0;
+
+        if (isFulfilled) fulfilledCount++;
+
+        // Sidebar row
+        const row = document.getElementById(`trow-${cat}`);
+        const status = document.getElementById(`ts-${cat}`);
+        const count = document.getElementById(`tr-${cat}`);
+
+        if (row) {
+            row.classList.remove('fulfilled', 'partial', 'missing');
+            if (isFulfilled) {
+                row.classList.add('fulfilled');
+                status.textContent = '✅';
+            } else if (isPartial) {
+                row.classList.add('partial');
+                status.textContent = '🟡';
+            } else if (isOptional) {
+                status.textContent = c > 0 ? '✅' : '○';
+            } else {
+                row.classList.add('missing');
+                status.textContent = '❌';
+            }
+        }
+
+        if (count) {
+            if (cfg.minRequired > 0) {
+                count.textContent = `${c}/${cfg.minRequired}`;
+            } else {
+                count.textContent = c > 0 ? `${c} ✓` : '–';
+            }
+        }
 
         // Badge
         const badge = document.querySelector(`.badge[data-cat="${cat}"]`);
         if (badge) {
-            badge.textContent = `${c}/${t}`;
+            badge.textContent = `${c}/${cfg.total}`;
             badge.classList.remove('partial', 'complete');
-            if (c >= t) badge.classList.add('complete');
-            else if (c > 0) badge.classList.add('partial');
+            if (isFulfilled) badge.classList.add('complete');
+            else if (isPartial) badge.classList.add('partial');
         }
     });
 
     // Total
-    document.getElementById('tardocTotal').textContent = total;
+    document.getElementById('tardocTotal').textContent = `${fulfilledCount}/${REQUIRED_CATS.length} Kategorien`;
 
     // TARDOC Position
-    updateTardocPosition(total);
+    updateTardocPosition(fulfilledCount);
 
     // Ampel
-    updateAmpel(total);
+    updateAmpel(fulfilledCount);
 }
 
 // ============================================
 // TARDOC POSITION
 // ============================================
-function updateTardocPosition(total) {
+function updateTardocPosition(fulfilled) {
     const el = document.getElementById('tardocPosition');
-    if (total === 0) {
-        el.textContent = '–';
-        el.classList.remove('active');
-        return;
-    }
-    const match = TARDOC_THRESHOLDS.find(t => total >= t.min && total <= t.max);
-    if (match) {
-        el.textContent = `${match.code} – ${match.label}`;
-        el.classList.add('active');
+    const total = REQUIRED_CATS.length; // 9
+
+    if (fulfilled === 0) {
+        el.textContent = 'Noch keine Kategorie erfüllt';
+        el.className = 'tardoc-position';
+    } else if (fulfilled < total) {
+        const missing = REQUIRED_CATS.filter(cat => counts[cat] < CATEGORIES[cat].minRequired);
+        const missingLabels = missing.map(cat => CATEGORIES[cat].label);
+        el.innerHTML = `<strong>${fulfilled}/${total} Kategorien erfüllt</strong><br>
+            <span style="color:#c0392b;font-size:12px;">Fehlend: ${missingLabels.join(', ')}</span>`;
+        el.className = 'tardoc-position partial-pos';
     } else {
-        el.textContent = `${total} Items – über Maximum`;
-        el.classList.add('active');
+        el.innerHTML = `<strong>✅ VOLLSTATUS ERFÜLLT</strong><br>
+            <span style="font-size:12px;">Alle ${total} Pflicht-Kategorien abgedeckt</span>`;
+        el.className = 'tardoc-position active';
     }
 }
 
 // ============================================
 // AMPEL
 // ============================================
-function updateAmpel(total) {
+function updateAmpel(fulfilled) {
     const rot = document.getElementById('ampel-rot');
     const gelb = document.getElementById('ampel-gelb');
     const gruen = document.getElementById('ampel-gruen');
     const text = document.getElementById('ampel-text');
+    const total = REQUIRED_CATS.length;
 
     rot.classList.remove('rot');
     gelb.classList.remove('gelb');
     gruen.classList.remove('gruen');
 
-    if (total === 0) {
-        text.textContent = 'Noch keine Items geprüft';
-    } else if (total <= 10) {
-        rot.classList.add('rot');
-        text.textContent = `${total} Items → Kurzstatus`;
-    } else if (total <= 25) {
-        gelb.classList.add('gelb');
-        text.textContent = `${total} Items → Teilstatus`;
+    if (fulfilled === 0) {
+        text.textContent = 'Noch keine Kategorie erfüllt';
+    } else if (fulfilled < total) {
+        if (fulfilled <= 3) {
+            rot.classList.add('rot');
+        } else {
+            gelb.classList.add('gelb');
+        }
+        text.textContent = `${fulfilled}/${total} Kategorien – noch ${total - fulfilled} fehlend`;
     } else {
         gruen.classList.add('gruen');
-        text.textContent = `${total} Items → Vollstatus`;
+        text.textContent = `Vollstatus erfüllt! (${total}/${total} Kategorien)`;
     }
 }
 
@@ -185,7 +224,6 @@ function fillNormal() {
         cb.checked = true;
         cb.closest('.exam-item').classList.add('checked');
     });
-    // Selects auf erste "normale" Option setzen
     document.querySelectorAll('.exam-item select').forEach(sel => {
         if (sel.options.length > 1) sel.selectedIndex = 1;
     });
@@ -218,7 +256,6 @@ function generateReport() {
     report += '══════════════════════════════════════\n\n';
 
     document.querySelectorAll('.exam-section[data-category]').forEach(section => {
-        const cat = section.getAttribute('data-category');
         const title = section.querySelector('.section-header span').textContent.replace('▸ ', '').replace('▾ ', '');
         const items = section.querySelectorAll('.exam-item');
         let sectionText = '';
@@ -238,7 +275,6 @@ function generateReport() {
             }
         });
 
-        // Freitext
         const ta = section.querySelector('textarea');
         if (ta && ta.value.trim()) {
             sectionText += `  📝 ${ta.value.trim()}\n`;
@@ -249,12 +285,16 @@ function generateReport() {
         }
     });
 
-    // TARDOC
-    let total = Object.values(counts).reduce((a, b) => a + b, 0);
+    // TARDOC Summary
+    let fulfilled = REQUIRED_CATS.filter(cat => counts[cat] >= CATEGORIES[cat].minRequired).length;
     report += '══════════════════════════════════════\n';
-    report += `TARDOC: ${total} Items geprüft\n`;
-    const match = TARDOC_THRESHOLDS.find(t => total >= t.min && total <= t.max);
-    if (match) report += `Position: ${match.code} – ${match.label}\n`;
+    report += `TARDOC: ${fulfilled}/${REQUIRED_CATS.length} Pflicht-Kategorien erfüllt\n`;
+    if (fulfilled >= REQUIRED_CATS.length) {
+        report += '→ VOLLSTATUS ERFÜLLT\n';
+    } else {
+        const missing = REQUIRED_CATS.filter(cat => counts[cat] < CATEGORIES[cat].minRequired);
+        report += `→ Fehlend: ${missing.map(c => CATEGORIES[c].label).join(', ')}\n`;
+    }
     report += '══════════════════════════════════════\n';
 
     document.getElementById('reportText').textContent = report;
@@ -269,6 +309,6 @@ function closeModal() {
 function copyReport() {
     if (!window._lastReport) generateReport();
     navigator.clipboard.writeText(window._lastReport).then(() => {
-        alert('✅ Bericht in Zwischenablage kopiert!');
+        alert('✅ Bericht kopiert!');
     });
 }
