@@ -1,305 +1,274 @@
-/* ================================================
-   NEUROSTATUS – App Logic
-   ================================================ */
-
-// ─── TARDOC CONFIG ───────────────────────────────
-const TARDOC = {
-    code: 'AA.05.0130',
-    description: 'Neurologischer Status, detailliert',
-    tpAL: 46.59,
-    tpIPL: 0,
-    requiredGroups: 9,
-    minGroups: 9,
-    categories: {
-        vigilanz:          { label: 'Vigilanz',             min: 1 },
-        hirnnerven:        { label: 'Hirnnerven',           min: 6 },
-        spontanmotorik:    { label: 'Spontanmotorik',       min: 1 },
-        muskelkraft:       { label: 'Muskelkraft',          min: 1 },
-        sensibilitaet:     { label: 'Sensibilität',         min: 1 },
-        koordination:      { label: 'Koordination',         min: 1 },
-        gangbild:          { label: 'Gangbild',             min: 1 },
-        reflexe:           { label: 'Muskeleigenreflexe',   min: 1 },
-        pyramidenzeichen:  { label: 'Pyramidenzeichen',     min: 1 }
-    }
+// ============================================
+// TARDOC KONFIGURATION
+// ============================================
+const CATEGORIES = {
+    vigilanz:      { label: 'Vigilanz / Bewusstsein', total: 3 },
+    hirnnerven:    { label: 'Hirnnerven', total: 13 },
+    motorik:       { label: 'Motorik / Tonus', total: 4 },
+    kraft:         { label: 'Muskelkraft', total: 6 },
+    sensibilitaet: { label: 'Sensibilität', total: 4 },
+    koordination:  { label: 'Koordination', total: 4 },
+    gang:          { label: 'Gangbild / Stand', total: 4 },
+    reflexe:       { label: 'Reflexe', total: 6 },
+    pyramiden:     { label: 'Pyramidenbahnzeichen', total: 3 },
+    meningeal:     { label: 'Meningeale Zeichen', total: 3 }
 };
 
-// ─── STATE ───────────────────────────────────────
-const state = {
-    checked: {},       // itemId → true
-    categoryCount: {}, // category → number of checked items
-    fulfilled: {}      // category → boolean
-};
+const TARDOC_THRESHOLDS = [
+    { min: 1,  max: 10, code: 'AA.05.01', label: 'Kurzstatus (1–10 Items)' },
+    { min: 11, max: 25, code: 'AA.05.02', label: 'Teilstatus (11–25 Items)' },
+    { min: 26, max: 50, code: 'AA.05.03', label: 'Vollstatus (26–50 Items)' },
+];
 
-// Initialize state
-Object.keys(TARDOC.categories).forEach(cat => {
-    state.categoryCount[cat] = 0;
-    state.fulfilled[cat] = false;
-});
+// ============================================
+// STATE
+// ============================================
+let counts = {};
+Object.keys(CATEGORIES).forEach(k => counts[k] = 0);
 
-// ─── DOM READY ───────────────────────────────────
+// ============================================
+// INIT
+// ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    initCheckboxes();
-    initSections();
+    buildTardocRows();
+    attachCheckboxListeners();
     updateAll();
+    // Erste Sektion öffnen
+    const firstBody = document.querySelector('.section-body');
+    if (firstBody) firstBody.classList.add('open');
 });
 
-// ─── CHECKBOX HANDLING ───────────────────────────
-function initCheckboxes() {
-    const checkboxes = document.querySelectorAll('.exam-item input[type="checkbox"]');
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', handleCheckboxChange);
+// ============================================
+// TARDOC SIDEBAR AUFBAUEN
+// ============================================
+function buildTardocRows() {
+    const container = document.getElementById('tardocRows');
+    container.innerHTML = '';
+    Object.keys(CATEGORIES).forEach(cat => {
+        const row = document.createElement('div');
+        row.className = 'tardoc-row';
+        row.innerHTML = `<span>${CATEGORIES[cat].label}</span><span class="count" id="tr-${cat}">0</span>`;
+        container.appendChild(row);
     });
 }
 
-function handleCheckboxChange(e) {
-    const cb = e.target;
-    const itemId = cb.dataset.item;
-    const examItem = cb.closest('.exam-item');
-    const category = examItem?.dataset?.tardoc;
-
-    if (!itemId || !category) return;
-
-    if (cb.checked) {
-        state.checked[itemId] = true;
-        examItem.classList.add('checked');
-    } else {
-        delete state.checked[itemId];
-        examItem.classList.remove('checked');
-    }
-
-    recountCategory(category);
-    updateAll();
-}
-
-function recountCategory(category) {
-    const items = document.querySelectorAll(`.exam-item[data-tardoc="${category}"] input[type="checkbox"]`);
-    let count = 0;
-    items.forEach(cb => {
-        if (cb.checked) count++;
-    });
-    state.categoryCount[category] = count;
-}
-
-// ─── RECALC ALL CATEGORIES ──────────────────────
-function recountAllCategories() {
-    Object.keys(TARDOC.categories).forEach(cat => {
-        recountCategory(cat);
+// ============================================
+// CHECKBOX LISTENER
+// ============================================
+function attachCheckboxListeners() {
+    document.querySelectorAll('input[type="checkbox"][data-cat]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const item = cb.closest('.exam-item');
+            if (cb.checked) {
+                item.classList.add('checked');
+            } else {
+                item.classList.remove('checked');
+            }
+            recount();
+            updateAll();
+        });
     });
 }
 
-// ─── FULFILLMENT CHECK ──────────────────────────
-function checkFulfillment() {
-    Object.keys(TARDOC.categories).forEach(cat => {
-        const min = TARDOC.categories[cat].min;
-        state.fulfilled[cat] = state.categoryCount[cat] >= min;
+// ============================================
+// ZÄHLUNG
+// ============================================
+function recount() {
+    Object.keys(counts).forEach(k => counts[k] = 0);
+    document.querySelectorAll('input[type="checkbox"][data-cat]:checked').forEach(cb => {
+        const cat = cb.getAttribute('data-cat');
+        if (counts.hasOwnProperty(cat)) counts[cat]++;
     });
 }
 
-function getFulfilledCount() {
-    return Object.values(state.fulfilled).filter(Boolean).length;
-}
-
-function isFullyFulfilled() {
-    return getFulfilledCount() >= TARDOC.minGroups;
-}
-
-// ─── UPDATE ALL UI ──────────────────────────────
+// ============================================
+// ALLE DISPLAYS AKTUALISIEREN
+// ============================================
 function updateAll() {
-    checkFulfillment();
-    updateTrafficLight();
-    updateRequirementsList();
-    updateBadges();
-    updateTaxpoints();
+    let total = 0;
+
+    Object.keys(CATEGORIES).forEach(cat => {
+        const c = counts[cat];
+        const t = CATEGORIES[cat].total;
+        total += c;
+
+        // Sidebar Zahl
+        const el = document.getElementById(`tr-${cat}`);
+        if (el) el.textContent = c;
+
+        // Badge
+        const badge = document.querySelector(`.badge[data-cat="${cat}"]`);
+        if (badge) {
+            badge.textContent = `${c}/${t}`;
+            badge.classList.remove('partial', 'complete');
+            if (c >= t) badge.classList.add('complete');
+            else if (c > 0) badge.classList.add('partial');
+        }
+    });
+
+    // Total
+    document.getElementById('tardocTotal').textContent = total;
+
+    // TARDOC Position
+    updateTardocPosition(total);
+
+    // Ampel
+    updateAmpel(total);
 }
 
-// ─── TRAFFIC LIGHT ──────────────────────────────
-function updateTrafficLight() {
-    const ampel = document.getElementById('ampel');
-    const light = document.getElementById('ampel-light');
+// ============================================
+// TARDOC POSITION
+// ============================================
+function updateTardocPosition(total) {
+    const el = document.getElementById('tardocPosition');
+    if (total === 0) {
+        el.textContent = '–';
+        el.classList.remove('active');
+        return;
+    }
+    const match = TARDOC_THRESHOLDS.find(t => total >= t.min && total <= t.max);
+    if (match) {
+        el.textContent = `${match.code} – ${match.label}`;
+        el.classList.add('active');
+    } else {
+        el.textContent = `${total} Items – über Maximum`;
+        el.classList.add('active');
+    }
+}
+
+// ============================================
+// AMPEL
+// ============================================
+function updateAmpel(total) {
+    const rot = document.getElementById('ampel-rot');
+    const gelb = document.getElementById('ampel-gelb');
+    const gruen = document.getElementById('ampel-gruen');
     const text = document.getElementById('ampel-text');
 
-    if (!ampel) return;
+    rot.classList.remove('rot');
+    gelb.classList.remove('gelb');
+    gruen.classList.remove('gruen');
 
-    const count = getFulfilledCount();
-    const total = TARDOC.requiredGroups;
-
-    if (isFullyFulfilled()) {
-        ampel.classList.add('green');
-        light.textContent = '🟢';
-        text.textContent = `Alle ${total} Gruppen erfüllt`;
+    if (total === 0) {
+        text.textContent = 'Noch keine Items geprüft';
+    } else if (total <= 10) {
+        rot.classList.add('rot');
+        text.textContent = `${total} Items → Kurzstatus`;
+    } else if (total <= 25) {
+        gelb.classList.add('gelb');
+        text.textContent = `${total} Items → Teilstatus`;
     } else {
-        ampel.classList.remove('green');
-        light.textContent = '🔴';
-        text.textContent = `${count}/${total} Gruppen erfüllt`;
+        gruen.classList.add('gruen');
+        text.textContent = `${total} Items → Vollstatus`;
     }
 }
 
-// ─── REQUIREMENTS LIST ──────────────────────────
-function updateRequirementsList() {
-    Object.keys(TARDOC.categories).forEach(cat => {
-        const icon = document.getElementById(`req-${cat}`);
-        if (!icon) return;
-
-        if (state.fulfilled[cat]) {
-            icon.textContent = '✓';
-            icon.classList.add('fulfilled');
-        } else {
-            icon.textContent = '✗';
-            icon.classList.remove('fulfilled');
-        }
-
-        // Update count display if exists
-        const countEl = document.getElementById(`count-${cat}`);
-        if (countEl) {
-            const min = TARDOC.categories[cat].min;
-            const current = state.categoryCount[cat];
-            countEl.textContent = `${current}/${min}`;
-        }
-    });
-}
-
-// ─── SECTION BADGES ─────────────────────────────
-function updateBadges() {
-    // Map sections to categories
-    const sectionMap = {
-        'vigilanz': ['vigilanz'],
-        'hirnnerven': ['hirnnerven'],
-        'motorik': ['spontanmotorik', 'muskelkraft'],
-        'sensibilitaet': ['sensibilitaet'],
-        'koordination-gang': ['koordination', 'gangbild'],
-        'reflexe': ['reflexe', 'pyramidenzeichen']
-    };
-
-    Object.keys(sectionMap).forEach(sectionId => {
-        const badge = document.getElementById(`badge-${sectionId}`);
-        if (!badge) return;
-
-        const cats = sectionMap[sectionId];
-        let totalChecked = 0;
-        let allFulfilled = true;
-
-        cats.forEach(cat => {
-            totalChecked += state.categoryCount[cat] || 0;
-            if (!state.fulfilled[cat]) allFulfilled = false;
-        });
-
-        if (totalChecked === 0) {
-            badge.textContent = '';
-            badge.style.background = '#e2e8f0';
-            badge.style.color = '#64748b';
-        } else if (allFulfilled) {
-            badge.textContent = `✓ ${totalChecked}`;
-            badge.style.background = '#dcfce7';
-            badge.style.color = '#166534';
-        } else {
-            badge.textContent = `${totalChecked}`;
-            badge.style.background = '#fef3c7';
-            badge.style.color = '#92400e';
-        }
-    });
-}
-
-// ─── TAXPOINTS ──────────────────────────────────
-function updateTaxpoints() {
-    const tpEl = document.getElementById('tp-display');
-    if (!tpEl) return;
-
-    if (isFullyFulfilled()) {
-        tpEl.textContent = `AL: ${TARDOC.tpAL} TP | IPL: ${TARDOC.tpIPL} TP`;
-    } else {
-        tpEl.textContent = 'Anforderungen nicht erfüllt';
+// ============================================
+// SECTION TOGGLE
+// ============================================
+function toggleSection(header) {
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+    const arrow = header.querySelector('span');
+    if (arrow) {
+        arrow.textContent = body.classList.contains('open')
+            ? arrow.textContent.replace('▸', '▾')
+            : arrow.textContent.replace('▾', '▸');
     }
 }
 
-// ─── SECTION TOGGLE ─────────────────────────────
-function initSections() {
-    // Open first section by default
-    const first = document.querySelector('.exam-section');
-    if (first) first.classList.add('open');
-}
-
-function toggleSection(headerEl) {
-    const section = headerEl.closest('.exam-section');
-    if (!section) return;
-
-    const isOpen = section.classList.contains('open');
-
-    // Toggle clicked section
-    if (isOpen) {
-        section.classList.remove('open');
-    } else {
-        section.classList.add('open');
-    }
-
-    // Update arrow
-    const h2 = headerEl.querySelector('h2');
-    if (h2) {
-        const text = h2.textContent.replace(/^[▸▾]\s*/, '');
-        h2.textContent = (section.classList.contains('open') ? '▾ ' : '▸ ') + text;
-    }
-}
-
-// ─── PRINT ──────────────────────────────────────
-function printForm() {
-    // Temporarily open all sections for printing
-    const sections = document.querySelectorAll('.exam-section');
-    const wasOpen = [];
-
-    sections.forEach((s, i) => {
-        wasOpen[i] = s.classList.contains('open');
-        s.classList.add('open');
+// ============================================
+// NORMALBEFUND
+// ============================================
+function fillNormal() {
+    document.querySelectorAll('input[type="checkbox"][data-cat]').forEach(cb => {
+        cb.checked = true;
+        cb.closest('.exam-item').classList.add('checked');
     });
-
-    window.print();
-
-    // Restore state after print dialog
-    setTimeout(() => {
-        sections.forEach((s, i) => {
-            if (!wasOpen[i]) s.classList.remove('open');
-        });
-    }, 500);
-}
-
-// ─── RESET ──────────────────────────────────────
-function resetForm() {
-    if (!confirm('Alle Eingaben zurücksetzen?')) return;
-
-    // Uncheck all checkboxes
-    document.querySelectorAll('.exam-item input[type="checkbox"]').forEach(cb => {
-        cb.checked = false;
-    });
-
-    // Uncheck all radios
-    document.querySelectorAll('.exam-item input[type="radio"]').forEach(r => {
-        r.checked = false;
-    });
-
-    // Reset all selects
+    // Selects auf erste "normale" Option setzen
     document.querySelectorAll('.exam-item select').forEach(sel => {
-        sel.selectedIndex = 0;
+        if (sel.options.length > 1) sel.selectedIndex = 1;
     });
-
-    // Reset all text inputs
-    document.querySelectorAll('.exam-item input[type="text"], .exam-item input[type="number"]').forEach(inp => {
-        inp.value = '';
-    });
-
-    // Reset all textareas
-    document.querySelectorAll('textarea').forEach(ta => {
-        ta.value = '';
-    });
-
-    // Remove checked highlights
-    document.querySelectorAll('.exam-item.checked').forEach(el => {
-        el.classList.remove('checked');
-    });
-
-    // Reset state
-    Object.keys(state.checked).forEach(k => delete state.checked[k]);
-    Object.keys(TARDOC.categories).forEach(cat => {
-        state.categoryCount[cat] = 0;
-        state.fulfilled[cat] = false;
-    });
-
+    recount();
     updateAll();
+}
+
+// ============================================
+// ZURÜCKSETZEN
+// ============================================
+function clearAll() {
+    document.querySelectorAll('input[type="checkbox"][data-cat]').forEach(cb => {
+        cb.checked = false;
+        cb.closest('.exam-item').classList.remove('checked');
+    });
+    document.querySelectorAll('.exam-item select').forEach(sel => sel.selectedIndex = 0);
+    document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+    document.querySelectorAll('input[type="text"], input[type="number"]').forEach(inp => inp.value = '');
+    recount();
+    updateAll();
+}
+
+// ============================================
+// BERICHT
+// ============================================
+function generateReport() {
+    let report = '══════════════════════════════════════\n';
+    report += '  NEUROLOGISCHER UNTERSUCHUNGSBERICHT\n';
+    report += '  ' + new Date().toLocaleString('de-CH') + '\n';
+    report += '══════════════════════════════════════\n\n';
+
+    document.querySelectorAll('.exam-section[data-category]').forEach(section => {
+        const cat = section.getAttribute('data-category');
+        const title = section.querySelector('.section-header span').textContent.replace('▸ ', '').replace('▾ ', '');
+        const items = section.querySelectorAll('.exam-item');
+        let sectionText = '';
+
+        items.forEach(item => {
+            const cb = item.querySelector('input[type="checkbox"][data-cat]');
+            if (cb && cb.checked) {
+                const label = cb.parentElement.textContent.trim();
+                const selects = item.querySelectorAll('select');
+                const inputs = item.querySelectorAll('input[type="text"], input[type="number"]');
+                let vals = [];
+                selects.forEach(s => { if (s.value) vals.push(s.value); });
+                inputs.forEach(i => { if (i.value) vals.push(i.value); });
+                sectionText += `  • ${label}`;
+                if (vals.length) sectionText += `: ${vals.join(', ')}`;
+                sectionText += '\n';
+            }
+        });
+
+        // Freitext
+        const ta = section.querySelector('textarea');
+        if (ta && ta.value.trim()) {
+            sectionText += `  📝 ${ta.value.trim()}\n`;
+        }
+
+        if (sectionText) {
+            report += `${title}\n${'─'.repeat(40)}\n${sectionText}\n`;
+        }
+    });
+
+    // TARDOC
+    let total = Object.values(counts).reduce((a, b) => a + b, 0);
+    report += '══════════════════════════════════════\n';
+    report += `TARDOC: ${total} Items geprüft\n`;
+    const match = TARDOC_THRESHOLDS.find(t => total >= t.min && total <= t.max);
+    if (match) report += `Position: ${match.code} – ${match.label}\n`;
+    report += '══════════════════════════════════════\n';
+
+    document.getElementById('reportText').textContent = report;
+    document.getElementById('modal').classList.add('show');
+    window._lastReport = report;
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('show');
+}
+
+function copyReport() {
+    if (!window._lastReport) generateReport();
+    navigator.clipboard.writeText(window._lastReport).then(() => {
+        alert('✅ Bericht in Zwischenablage kopiert!');
+    });
 }
