@@ -16,6 +16,13 @@ body {
 }
 
 /* ============================================
+   PRINT HEADER (hidden on screen)
+   ============================================ */
+.print-header {
+    display: none;
+}
+
+/* ============================================
    HEADER
    ============================================ */
 header {
@@ -139,15 +146,15 @@ header p {
     justify-content: space-between;
     align-items: center;
     padding: 14px 20px;
+    background: #f8f9fa;
     cursor: pointer;
-    background: #fafbfc;
-    border-bottom: 1px solid #eee;
     user-select: none;
+    border-bottom: 1px solid #eee;
     transition: background 0.2s;
 }
 
 .section-header:hover {
-    background: #f0f4f8;
+    background: #e9ecef;
 }
 
 .section-header span:first-child {
@@ -155,57 +162,37 @@ header p {
     font-size: 15px;
 }
 
-/* Badge */
-.badge {
+.section-badge {
     background: #e9ecef;
     color: #666;
+    padding: 2px 10px;
+    border-radius: 12px;
     font-size: 12px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    transition: all 0.3s;
+    font-weight: 700;
 }
 
-.badge.partial {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.badge.complete {
-    background: #d4edda;
-    color: #155724;
-}
-
-/* Section body toggle */
 .section-body {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.35s ease;
+    transition: max-height 0.4s ease;
 }
 
 .section-body.open {
-    max-height: 3000px;
+    max-height: 2000px;
 }
 
-/* ============================================
-   EXAM ITEMS
-   ============================================ */
 .exam-item {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 10px 20px;
     border-bottom: 1px solid #f5f5f5;
-    transition: background 0.2s;
     flex-wrap: wrap;
-}
-
-.exam-item:last-child {
-    border-bottom: none;
+    transition: all 0.2s;
 }
 
 .exam-item:hover {
-    background: #f8f9ff;
+    background: #f8faff;
 }
 
 .exam-item.checked {
@@ -263,7 +250,7 @@ header p {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-/* Sub-checkboxen (z.B. Orientierung) */
+/* Sub-checkboxen */
 .sub-checks {
     display: flex;
     gap: 12px;
@@ -481,24 +468,6 @@ header p {
     background: #f5c6cb;
 }
 
-.btn-report {
-    background: #2563eb;
-    color: white;
-}
-
-.btn-report:hover {
-    background: #1d4ed8;
-}
-
-.btn-copy {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-copy:hover {
-    background: #5a6268;
-}
-
 .btn-print {
     background: #495057;
     color: white;
@@ -506,24 +475,6 @@ header p {
 
 .btn-print:hover {
     background: #343a40;
-}
-
-.btn-save {
-    background: #17a2b8;
-    color: white;
-}
-
-.btn-save:hover {
-    background: #138496;
-}
-
-.btn-load {
-    background: #e2e6ea;
-    color: #495057;
-}
-
-.btn-load:hover {
-    background: #d6d8db;
 }
 
 /* ============================================
@@ -665,40 +616,142 @@ header p {
    PRINT
    ============================================ */
 @media print {
+    /* Hide screen-only elements */
     header,
     .sidebar,
     .ampel-card,
     .modal-overlay,
-    .btn {
+    .btn,
+    .freitext-row textarea:placeholder-shown,
+    input[type="checkbox"] {
         display: none !important;
     }
 
     body {
         background: white;
-        font-size: 12px;
+        font-size: 11pt;
+        color: #000;
+        line-height: 1.4;
     }
 
+    /* Show print header */
+    .print-header {
+        display: block !important;
+        padding: 20px 0 10px;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #2c3e50;
+    }
+
+    .print-header h1 {
+        font-size: 20pt;
+        color: #2c3e50;
+        margin-bottom: 12px;
+    }
+
+    .print-meta {
+        font-size: 10pt;
+        color: #555;
+        line-height: 1.6;
+    }
+
+    .print-meta strong {
+        color: #000;
+    }
+
+    /* Layout */
     .main-layout {
         display: block;
+        padding: 0;
+        margin: 0;
     }
 
+    /* Sections */
     .exam-section {
         box-shadow: none;
-        border: 1px solid #ddd;
+        border: none;
+        border-radius: 0;
+        margin-bottom: 6px;
         break-inside: avoid;
     }
 
-    .section-body {
-        max-height: none !important;
+    .section-header {
+        background: #f0f0f0 !important;
+        padding: 6px 12px;
+        border-bottom: 1px solid #ccc;
     }
 
-    .exam-item:not(.checked) {
+    .section-badge {
         display: none;
     }
 
+    /* Show all section bodies */
+    .section-body {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    /* Hide unchecked items */
+    .exam-item:not(.checked) {
+        display: none !important;
+    }
+
+    /* Checked items print style */
     .exam-item.checked {
-        border-left: none;
+        border-left: 2px solid #2c3e50;
         background: none;
+        padding: 4px 12px;
+        page-break-inside: avoid;
+    }
+
+    .exam-item.checked label {
+        font-weight: 600;
+        font-size: 10pt;
+    }
+
+    .exam-item.checked select,
+    .exam-item.checked input[type="text"],
+    .exam-item.checked input[type="number"] {
+        border: none;
+        background: none;
+        font-weight: 400;
+        font-size: 10pt;
+        padding: 0;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    /* Freitext with content */
+    .freitext-row {
+        padding: 2px 12px;
+        background: none;
+    }
+
+    .freitext-row textarea {
+        border: none;
+        background: none;
+        font-size: 10pt;
+        font-style: italic;
+        padding: 2px 0;
+        resize: none;
+        min-height: auto;
+        overflow: hidden;
+    }
+
+    /* Hide sections with no checked items */
+    .exam-section:not(:has(.exam-item.checked)):not(:has(textarea:not(:placeholder-shown))) {
+        display: none !important;
+    }
+
+    /* Sub-checks */
+    .sub-checks input[type="checkbox"] {
+        display: inline-block !important;
+        width: 12px;
+        height: 12px;
+    }
+
+    .side-inputs span {
+        font-size: 10pt;
     }
 }
 

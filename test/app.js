@@ -14,7 +14,6 @@ const CATEGORIES = {
     meningeal:     { label: 'Meningeale Zeichen',     total: 3,  minRequired: 0 }
 };
 
-// Pflicht-Kategorien für Vollstatus (alle ausser meningeal)
 const REQUIRED_CATS = ['vigilanz','hirnnerven','motorik','kraft','sensibilitaet','koordination','gang','reflexe','pyramiden'];
 
 // ============================================
@@ -30,9 +29,21 @@ document.addEventListener('DOMContentLoaded', () => {
     buildTardocRows();
     attachCheckboxListeners();
     updateAll();
+    updatePrintDate();
     const firstBody = document.querySelector('.section-body');
     if (firstBody) firstBody.classList.add('open');
 });
+
+// ============================================
+// PRINT DATE
+// ============================================
+function updatePrintDate() {
+    const el = document.getElementById('printDate');
+    if (el) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        el.textContent = new Date().toLocaleDateString('de-CH', options);
+    }
+}
 
 // ============================================
 // TARDOC SIDEBAR
@@ -55,7 +66,7 @@ function buildTardocRows() {
 }
 
 // ============================================
-// CHECKBOX LISTENER
+// CHECKBOX LISTENERS
 // ============================================
 function attachCheckboxListeners() {
     document.querySelectorAll('input[type="checkbox"][data-cat]').forEach(cb => {
@@ -73,70 +84,73 @@ function attachCheckboxListeners() {
 }
 
 // ============================================
-// ZÄHLUNG
+// RECOUNT
 // ============================================
 function recount() {
     Object.keys(counts).forEach(k => counts[k] = 0);
     document.querySelectorAll('input[type="checkbox"][data-cat]:checked').forEach(cb => {
-        const cat = cb.getAttribute('data-cat');
+        const cat = cb.dataset.cat;
         if (counts.hasOwnProperty(cat)) counts[cat]++;
     });
 }
 
 // ============================================
-// ALLES AKTUALISIEREN
+// SECTION TOGGLE
+// ============================================
+function toggleSection(headerEl) {
+    const body = headerEl.nextElementSibling;
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open');
+    const label = headerEl.querySelector('span');
+    if (isOpen) {
+        label.textContent = label.textContent.replace('▾', '▸');
+    } else {
+        label.textContent = label.textContent.replace('▸', '▾');
+    }
+}
+
+// ============================================
+// UPDATE ALL
 // ============================================
 function updateAll() {
     let fulfilledCount = 0;
-    let totalChecked = 0;
 
     Object.keys(CATEGORIES).forEach(cat => {
         const cfg = CATEGORIES[cat];
-        const c = counts[cat];
-        totalChecked += c;
-
-        const isFulfilled = cfg.minRequired > 0 && c >= cfg.minRequired;
-        const isPartial = cfg.minRequired > 0 && c > 0 && c < cfg.minRequired;
-        const isOptional = cfg.minRequired === 0;
-
-        if (isFulfilled) fulfilledCount++;
-
-        // Sidebar row
+        const count = counts[cat];
         const row = document.getElementById(`trow-${cat}`);
-        const status = document.getElementById(`ts-${cat}`);
-        const count = document.getElementById(`tr-${cat}`);
+        const countEl = document.getElementById(`tr-${cat}`);
+        const statusEl = document.getElementById(`ts-${cat}`);
+        const badge = document.getElementById(`badge-${cat}`);
 
-        if (row) {
-            row.classList.remove('fulfilled', 'partial', 'missing');
-            if (isFulfilled) {
+        const minLabel = cfg.minRequired > 0 ? cfg.minRequired : '–';
+        countEl.textContent = `${count}/${minLabel}`;
+
+        // Row class
+        row.classList.remove('fulfilled', 'partial', 'missing');
+        if (cfg.minRequired === 0) {
+            if (count > 0) {
                 row.classList.add('fulfilled');
-                status.textContent = '✅';
-            } else if (isPartial) {
-                row.classList.add('partial');
-                status.textContent = '🟡';
-            } else if (isOptional) {
-                status.textContent = c > 0 ? '✅' : '○';
+                statusEl.textContent = '✅';
             } else {
                 row.classList.add('missing');
-                status.textContent = '❌';
+                statusEl.textContent = '○';
             }
-        }
-
-        if (count) {
-            if (cfg.minRequired > 0) {
-                count.textContent = `${c}/${cfg.minRequired}`;
-            } else {
-                count.textContent = c > 0 ? `${c} ✓` : '–';
-            }
+        } else if (count >= cfg.minRequired) {
+            row.classList.add('fulfilled');
+            statusEl.textContent = '✅';
+            if (REQUIRED_CATS.includes(cat)) fulfilledCount++;
+        } else if (count > 0) {
+            row.classList.add('partial');
+            statusEl.textContent = '⚠️';
+        } else {
+            row.classList.add('missing');
+            statusEl.textContent = '○';
         }
 
         // Badge
-        const badge = document.querySelector(`.badge[data-cat="${cat}"]`);
         if (badge) {
-            badge.textContent = `${c}/${cfg.total}`;
-            badge.classList.remove('partial', 'complete');
-            if (isFulfilled) badge.classList.add('complete');
-            else if (isPartial) badge.classList.add('partial');
+            badge.textContent = `${count}/${minLabel}`;
         }
     });
 
@@ -155,7 +169,7 @@ function updateAll() {
 // ============================================
 function updateTardocPosition(fulfilled) {
     const el = document.getElementById('tardocPosition');
-    const total = REQUIRED_CATS.length; // 9
+    const total = REQUIRED_CATS.length;
 
     if (fulfilled === 0) {
         el.textContent = 'Noch keine Kategorie erfüllt';
@@ -177,42 +191,26 @@ function updateTardocPosition(fulfilled) {
 // AMPEL
 // ============================================
 function updateAmpel(fulfilled) {
+    const total = REQUIRED_CATS.length;
     const rot = document.getElementById('ampel-rot');
     const gelb = document.getElementById('ampel-gelb');
     const gruen = document.getElementById('ampel-gruen');
     const text = document.getElementById('ampel-text');
-    const total = REQUIRED_CATS.length;
 
+    // Reset
     rot.classList.remove('rot');
     gelb.classList.remove('gelb');
     gruen.classList.remove('gruen');
 
     if (fulfilled === 0) {
-        text.textContent = 'Noch keine Kategorie erfüllt';
+        rot.classList.add('rot');
+        text.textContent = 'Noch keine Items geprüft';
     } else if (fulfilled < total) {
-        if (fulfilled <= 3) {
-            rot.classList.add('rot');
-        } else {
-            gelb.classList.add('gelb');
-        }
-        text.textContent = `${fulfilled}/${total} Kategorien – noch ${total - fulfilled} fehlend`;
+        gelb.classList.add('gelb');
+        text.textContent = `${fulfilled}/${total} Kategorien – noch nicht vollständig`;
     } else {
         gruen.classList.add('gruen');
-        text.textContent = `Vollstatus erfüllt! (${total}/${total} Kategorien)`;
-    }
-}
-
-// ============================================
-// SECTION TOGGLE
-// ============================================
-function toggleSection(header) {
-    const body = header.nextElementSibling;
-    body.classList.toggle('open');
-    const arrow = header.querySelector('span');
-    if (arrow) {
-        arrow.textContent = body.classList.contains('open')
-            ? arrow.textContent.replace('▸', '▾')
-            : arrow.textContent.replace('▾', '▸');
+        text.textContent = 'Vollstatus erfüllt ✓';
     }
 }
 
@@ -244,71 +242,4 @@ function clearAll() {
     document.querySelectorAll('input[type="text"], input[type="number"]').forEach(inp => inp.value = '');
     recount();
     updateAll();
-}
-
-// ============================================
-// BERICHT
-// ============================================
-function generateReport() {
-    let report = '══════════════════════════════════════\n';
-    report += '  NEUROLOGISCHER UNTERSUCHUNGSBERICHT\n';
-    report += '  ' + new Date().toLocaleString('de-CH') + '\n';
-    report += '══════════════════════════════════════\n\n';
-
-    document.querySelectorAll('.exam-section[data-category]').forEach(section => {
-        const title = section.querySelector('.section-header span').textContent.replace('▸ ', '').replace('▾ ', '');
-        const items = section.querySelectorAll('.exam-item');
-        let sectionText = '';
-
-        items.forEach(item => {
-            const cb = item.querySelector('input[type="checkbox"][data-cat]');
-            if (cb && cb.checked) {
-                const label = cb.parentElement.textContent.trim();
-                const selects = item.querySelectorAll('select');
-                const inputs = item.querySelectorAll('input[type="text"], input[type="number"]');
-                let vals = [];
-                selects.forEach(s => { if (s.value) vals.push(s.value); });
-                inputs.forEach(i => { if (i.value) vals.push(i.value); });
-                sectionText += `  • ${label}`;
-                if (vals.length) sectionText += `: ${vals.join(', ')}`;
-                sectionText += '\n';
-            }
-        });
-
-        const ta = section.querySelector('textarea');
-        if (ta && ta.value.trim()) {
-            sectionText += `  📝 ${ta.value.trim()}\n`;
-        }
-
-        if (sectionText) {
-            report += `${title}\n${'─'.repeat(40)}\n${sectionText}\n`;
-        }
-    });
-
-    // TARDOC Summary
-    let fulfilled = REQUIRED_CATS.filter(cat => counts[cat] >= CATEGORIES[cat].minRequired).length;
-    report += '══════════════════════════════════════\n';
-    report += `TARDOC: ${fulfilled}/${REQUIRED_CATS.length} Pflicht-Kategorien erfüllt\n`;
-    if (fulfilled >= REQUIRED_CATS.length) {
-        report += '→ VOLLSTATUS ERFÜLLT\n';
-    } else {
-        const missing = REQUIRED_CATS.filter(cat => counts[cat] < CATEGORIES[cat].minRequired);
-        report += `→ Fehlend: ${missing.map(c => CATEGORIES[c].label).join(', ')}\n`;
-    }
-    report += '══════════════════════════════════════\n';
-
-    document.getElementById('reportText').textContent = report;
-    document.getElementById('modal').classList.add('show');
-    window._lastReport = report;
-}
-
-function closeModal() {
-    document.getElementById('modal').classList.remove('show');
-}
-
-function copyReport() {
-    if (!window._lastReport) generateReport();
-    navigator.clipboard.writeText(window._lastReport).then(() => {
-        alert('✅ Bericht kopiert!');
-    });
 }

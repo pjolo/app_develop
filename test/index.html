@@ -8,6 +8,15 @@
 </head>
 <body>
 
+<!-- PRINT-ONLY HEADER -->
+<div class="print-header">
+    <h1>🧠 Neurologische Untersuchung - Hirnstatus</h1>
+    <div class="print-meta">
+        <p><strong>Datum:</strong> <span id="printDate"></span></p>
+        <p><strong>TARDOC-Code:</strong> AA.05.0130 – Neurologische Untersuchung (Hirnstatus)</p>
+    </div>
+</div>
+
 <header>
     <h1>🧠 Neurostatus</h1>
     <p>Systematische neurologische Untersuchung · TARDOC-konform</p>
@@ -29,74 +38,78 @@
     <p id="ampel-text">Noch keine Items geprüft</p>
 </div>
 
-<!-- SEK 1: VIGILANZ -->
+<!-- === 1. VIGILANZ === -->
 <div class="exam-section" data-category="vigilanz">
     <div class="section-header" onclick="toggleSection(this)">
         <span>▸ 1. Vigilanz / Bewusstsein</span>
-        <span class="badge" data-cat="vigilanz">0/3</span>
+        <span class="section-badge" id="badge-vigilanz">0/1</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="vigilanz"> Vigilanzlevel</label>
-            <select><option value="">–</option><option>Wach, orientiert</option><option>Somnolent</option><option>Soporös</option><option>Komatös</option></select>
+            <label><input type="checkbox" data-cat="vigilanz"> Wachheit</label>
+            <select><option value="">–</option><option>Wach, alert</option><option>Somnolent</option><option>Soporös</option><option>Komatös</option></select>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="vigilanz"> Orientierung</label>
-            <span class="sub-checks">
-                <label><input type="checkbox" disabled> Zeitlich</label>
-                <label><input type="checkbox" disabled> Örtlich</label>
-                <label><input type="checkbox" disabled> Person</label>
-                <label><input type="checkbox" disabled> Situativ</label>
-            </span>
+            <div class="sub-checks">
+                <label><input type="checkbox"> Zeitlich</label>
+                <label><input type="checkbox"> Örtlich</label>
+                <label><input type="checkbox"> Person</label>
+                <label><input type="checkbox"> Situativ</label>
+            </div>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="vigilanz"> GCS</label>
-            <span>A:<input type="number" min="1" max="4" style="width:40px"> V:<input type="number" min="1" max="5" style="width:40px"> M:<input type="number" min="1" max="6" style="width:40px"></span>
+            <div class="side-inputs">
+                <span>A:</span><input type="number" min="1" max="4" placeholder="1-4" style="width:55px">
+                <span>V:</span><input type="number" min="1" max="5" placeholder="1-5" style="width:55px">
+                <span>M:</span><input type="number" min="1" max="6" placeholder="1-6" style="width:55px">
+            </div>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Vigilanz (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Vigilanz"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 2: HIRNNERVEN -->
+<!-- === 2. HIRNNERVEN === -->
 <div class="exam-section" data-category="hirnnerven">
     <div class="section-header" onclick="toggleSection(this)">
         <span>▸ 2. Hirnnerven</span>
-        <span class="badge" data-cat="hirnnerven">0/13</span>
+        <span class="section-badge" id="badge-hirnnerven">0/6</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
             <label><input type="checkbox" data-cat="hirnnerven"> N. I – Geruch</label>
-            <select><option value="">–</option><option>Normal</option><option>Hyposmie R</option><option>Hyposmie L</option><option>Anosmie R</option><option>Anosmie L</option></select>
+            <select><option value="">–</option><option>Intakt bds.</option><option>Anosmie R</option><option>Anosmie L</option><option>Hyposmie R</option><option>Hyposmie L</option></select>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="hirnnerven"> N. II – Visus</label>
-            <span>R:<input type="text" style="width:50px" placeholder="1.0"> L:<input type="text" style="width:50px" placeholder="1.0"></span>
-        </div>
-        <div class="exam-item">
-            <label><input type="checkbox" data-cat="hirnnerven"> N. II – Gesichtsfeld</label>
-            <select><option value="">–</option><option>Intakt</option><option>Hemianopsie R</option><option>Hemianopsie L</option><option>Quadrantenanopsie</option></select>
-        </div>
-        <div class="exam-item">
-            <label><input type="checkbox" data-cat="hirnnerven"> N. II/III – Pupillen</label>
-            <select><option value="">–</option><option>Isokor, lichtreagibel</option><option>Anisokor</option><option>Lichtstarr bds.</option></select>
+            <label><input type="checkbox" data-cat="hirnnerven"> N. II – Visus/Gesichtsfeld</label>
+            <select><option value="">–</option><option>Intakt, kein Defizit</option><option>Hemianopsie R</option><option>Hemianopsie L</option><option>Quadrantenanopsie</option></select>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="hirnnerven"> N. II – Fundoskopie</label>
-            <select><option value="">–</option><option>Normal bds.</option><option>Papillenödem</option><option>Stauungspapille</option></select>
+            <select><option value="">–</option><option>Normal bds.</option><option>Papillenödem R</option><option>Papillenödem L</option><option>Papillenödem bds.</option></select>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="hirnnerven"> N. III/IV/VI – Augenmotilität</label>
-            <select><option value="">–</option><option>Frei in alle Richtungen</option><option>Doppelbilder</option><option>Blickparese</option></select>
+            <label><input type="checkbox" data-cat="hirnnerven"> N. II – Pupillen</label>
+            <select><option value="">–</option><option>Isokor, rund, lichtreaktiv</option><option>Anisokor R>L</option><option>Anisokor L>R</option><option>Entrundet R</option><option>Entrundet L</option></select>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="hirnnerven"> N. V – Sensibilität Gesicht</label>
-            <select><option value="">–</option><option>Intakt alle 3 Äste</option><option>V1 gemindert</option><option>V2 gemindert</option><option>V3 gemindert</option></select>
+            <label><input type="checkbox" data-cat="hirnnerven"> N. III/IV/VI – Okulomotorik</label>
+            <select><option value="">–</option><option>Frei in alle Richtungen</option><option>Doppelbilder horizontal</option><option>Doppelbilder vertikal</option><option>Internukleäre Ophthalmoplegie</option></select>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="hirnnerven"> N. V – Kaumuskulatur</label>
-            <select><option value="">–</option><option>Kräftig bds.</option><option>Schwäche rechts</option><option>Schwäche links</option></select>
+            <label><input type="checkbox" data-cat="hirnnerven"> Nystagmus</label>
+            <select><option value="">–</option><option>Kein Nystagmus</option><option>Horizontaler Nystagmus R</option><option>Horizontaler Nystagmus L</option><option>Vertikaler Nystagmus</option><option>Rotatorisch</option></select>
+        </div>
+        <div class="exam-item">
+            <label><input type="checkbox" data-cat="hirnnerven"> N. V – Sensibilität</label>
+            <select><option value="">–</option><option>Intakt V1-V3 bds.</option><option>Hypästhesie V1</option><option>Hypästhesie V2</option><option>Hypästhesie V3</option></select>
+        </div>
+        <div class="exam-item">
+            <label><input type="checkbox" data-cat="hirnnerven"> N. V – Masseter/Kornealreflex</label>
+            <select><option value="">–</option><option>Masseter kräftig, Kornealreflex +</option><option>Masseter schwach</option><option>Kornealreflex fehlend R</option><option>Kornealreflex fehlend L</option></select>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="hirnnerven"> N. VII – Facialis</label>
@@ -119,266 +132,317 @@
             <select><option value="">–</option><option>Mittig, keine Atrophie</option><option>Deviation R</option><option>Deviation L</option><option>Fibrillationen</option></select>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Hirnnerven (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Hirnnerven"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 3: MOTORIK/TONUS -->
+<!-- === 3. MOTORIK === -->
 <div class="exam-section" data-category="motorik">
     <div class="section-header" onclick="toggleSection(this)">
-        <span>▸ 3. Motorik / Tonus</span>
-        <span class="badge" data-cat="motorik">0/4</span>
+        <span>▸ 3. Spontanmotorik / Tonus</span>
+        <span class="section-badge" id="badge-motorik">0/1</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
+            <label><input type="checkbox" data-cat="motorik"> Spontanmotorik</label>
+            <select><option value="">–</option><option>Unauffällig</option><option>Tremor</option><option>Myoklonien</option><option>Choreatiforme Bewegungen</option><option>Dystonie</option></select>
+        </div>
+        <div class="exam-item">
+            <label><input type="checkbox" data-cat="motorik"> Tremor-Spezifikation</label>
+            <select><option value="">–</option><option>Ruhetremor</option><option>Haltetremor</option><option>Intentionstremor</option></select>
+            <select><option value="">–</option><option>R</option><option>L</option><option>Bds.</option></select>
+        </div>
+        <div class="exam-item">
             <label><input type="checkbox" data-cat="motorik"> Tonus OE</label>
-            <select><option value="">–</option><option>Normal bds.</option><option>Spastik R</option><option>Spastik L</option><option>Rigor R</option><option>Rigor L</option><option>Hypotonie</option></select>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Normal</option><option>Spastisch</option><option>Rigide</option><option>Hypoton</option></select>
+                <span>L:</span><select><option value="">–</option><option>Normal</option><option>Spastisch</option><option>Rigide</option><option>Hypoton</option></select>
+            </div>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="motorik"> Tonus UE</label>
-            <select><option value="">–</option><option>Normal bds.</option><option>Spastik R</option><option>Spastik L</option><option>Rigor R</option><option>Rigor L</option><option>Hypotonie</option></select>
-        </div>
-        <div class="exam-item">
-            <label><input type="checkbox" data-cat="motorik"> Vorhalteversuch Arme</label>
-            <select><option value="">–</option><option>Kein Absinken</option><option>Absinken R</option><option>Absinken L</option><option>Pronation R</option><option>Pronation L</option></select>
-        </div>
-        <div class="exam-item">
-            <label><input type="checkbox" data-cat="motorik"> Vorhalteversuch Beine</label>
-            <select><option value="">–</option><option>Kein Absinken</option><option>Absinken R</option><option>Absinken L</option></select>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Normal</option><option>Spastisch</option><option>Rigide</option><option>Hypoton</option></select>
+                <span>L:</span><select><option value="">–</option><option>Normal</option><option>Spastisch</option><option>Rigide</option><option>Hypoton</option></select>
+            </div>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Motorik (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Motorik"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 4: KRAFT -->
+<!-- === 4. KRAFT === -->
 <div class="exam-section" data-category="kraft">
     <div class="section-header" onclick="toggleSection(this)">
         <span>▸ 4. Muskelkraft (MRC 0–5)</span>
-        <span class="badge" data-cat="kraft">0/6</span>
+        <span class="section-badge" id="badge-kraft">0/1</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="kraft"> Schulter Abduktion</label>
-            R:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-            L:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+            <label><input type="checkbox" data-cat="kraft"> Armvorhalteversuch</label>
+            <select><option value="">–</option><option>Kein Absinken</option><option>Absinken R</option><option>Absinken L</option><option>Pronation R</option><option>Pronation L</option></select>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="kraft"> Ellbogen Flexion</label>
-            R:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-            L:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+            <label><input type="checkbox" data-cat="kraft"> Beinvorhalteversuch</label>
+            <select><option value="">–</option><option>Kein Absinken</option><option>Absinken R</option><option>Absinken L</option></select>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="kraft"> Handgriff</label>
-            R:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-            L:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+            <label><input type="checkbox" data-cat="kraft"> Kraft OE proximal</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>5/5</option><option>4/5</option><option>3/5</option><option>2/5</option><option>1/5</option><option>0/5</option></select>
+                <span>L:</span><select><option value="">–</option><option>5/5</option><option>4/5</option><option>3/5</option><option>2/5</option><option>1/5</option><option>0/5</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="kraft"> Hüfte Flexion</label>
-            R:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-            L:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+            <label><input type="checkbox" data-cat="kraft"> Kraft OE distal</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>5/5</option><option>4/5</option><option>3/5</option><option>2/5</option><option>1/5</option><option>0/5</option></select>
+                <span>L:</span><select><option value="">–</option><option>5/5</option><option>4/5</option><option>3/5</option><option>2/5</option><option>1/5</option><option>0/5</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="kraft"> Knie Extension</label>
-            R:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-            L:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+            <label><input type="checkbox" data-cat="kraft"> Kraft UE proximal</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>5/5</option><option>4/5</option><option>3/5</option><option>2/5</option><option>1/5</option><option>0/5</option></select>
+                <span>L:</span><select><option value="">–</option><option>5/5</option><option>4/5</option><option>3/5</option><option>2/5</option><option>1/5</option><option>0/5</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="kraft"> Fuss Dorsiflexion</label>
-            R:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-            L:<select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+            <label><input type="checkbox" data-cat="kraft"> Kraft UE distal</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>5/5</option><option>4/5</option><option>3/5</option><option>2/5</option><option>1/5</option><option>0/5</option></select>
+                <span>L:</span><select><option value="">–</option><option>5/5</option><option>4/5</option><option>3/5</option><option>2/5</option><option>1/5</option><option>0/5</option></select>
+            </div>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Kraft (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Kraft"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 5: SENSIBILITÄT -->
+<!-- === 5. SENSIBILITÄT === -->
 <div class="exam-section" data-category="sensibilitaet">
     <div class="section-header" onclick="toggleSection(this)">
         <span>▸ 5. Sensibilität</span>
-        <span class="badge" data-cat="sensibilitaet">0/4</span>
+        <span class="section-badge" id="badge-sensibilitaet">0/1</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="sensibilitaet"> Berührung (Leicht)</label>
-            <select><option value="">–</option><option>Intakt bds.</option><option>Gemindert R</option><option>Gemindert L</option><option>Aufgehoben</option></select>
+            <label><input type="checkbox" data-cat="sensibilitaet"> Berührung (taktil)</label>
+            <div class="side-inputs">
+                <span>OE R:</span><select><option value="">–</option><option>Normal</option><option>Hypästhesie</option><option>Anästhesie</option><option>Hyperästhesie</option></select>
+                <span>OE L:</span><select><option value="">–</option><option>Normal</option><option>Hypästhesie</option><option>Anästhesie</option><option>Hyperästhesie</option></select>
+            </div>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="sensibilitaet"> Schmerz (Nadelstich)</label>
-            <select><option value="">–</option><option>Intakt bds.</option><option>Gemindert R</option><option>Gemindert L</option><option>Aufgehoben</option></select>
+            <div class="side-inputs">
+                <span>OE R:</span><select><option value="">–</option><option>Normal</option><option>Hypalgesie</option><option>Analgesie</option><option>Hyperalgesie</option></select>
+                <span>OE L:</span><select><option value="">–</option><option>Normal</option><option>Hypalgesie</option><option>Analgesie</option><option>Hyperalgesie</option></select>
+            </div>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="sensibilitaet"> Vibration (Stimmgabel)</label>
-            R:<input type="number" min="0" max="8" style="width:40px" placeholder="8">
-            L:<input type="number" min="0" max="8" style="width:40px" placeholder="8">
+            <div class="side-inputs">
+                <span>R:</span><input type="text" placeholder="x/8" style="width:55px">
+                <span>L:</span><input type="text" placeholder="x/8" style="width:55px">
+            </div>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="sensibilitaet"> Lagesinn</label>
-            <select><option value="">–</option><option>Intakt bds.</option><option>Gestört R</option><option>Gestört L</option><option>Gestört bds.</option></select>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Intakt</option><option>Gestört</option></select>
+                <span>L:</span><select><option value="">–</option><option>Intakt</option><option>Gestört</option></select>
+            </div>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Sensibilität (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Sensibilität"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 6: KOORDINATION -->
+<!-- === 6. KOORDINATION === -->
 <div class="exam-section" data-category="koordination">
     <div class="section-header" onclick="toggleSection(this)">
         <span>▸ 6. Koordination</span>
-        <span class="badge" data-cat="koordination">0/4</span>
+        <span class="section-badge" id="badge-koordination">0/1</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
             <label><input type="checkbox" data-cat="koordination"> Finger-Nase-Versuch</label>
-            R:<select><option value="">–</option><option>Sicher</option><option>Dysmetrie</option><option>Intentionstremor</option></select>
-            L:<select><option value="">–</option><option>Sicher</option><option>Dysmetrie</option><option>Intentionstremor</option></select>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Zielsicher</option><option>Dysmetrisch</option><option>Intentionstremor</option></select>
+                <span>L:</span><select><option value="">–</option><option>Zielsicher</option><option>Dysmetrisch</option><option>Intentionstremor</option></select>
+            </div>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="koordination"> Knie-Hacke-Versuch</label>
-            R:<select><option value="">–</option><option>Sicher</option><option>Unsicher</option><option>Ataktisch</option></select>
-            L:<select><option value="">–</option><option>Sicher</option><option>Unsicher</option><option>Ataktisch</option></select>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Zielsicher</option><option>Dysmetrisch</option><option>Ataktisch</option></select>
+                <span>L:</span><select><option value="">–</option><option>Zielsicher</option><option>Dysmetrisch</option><option>Ataktisch</option></select>
+            </div>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="koordination"> Diadochokinese</label>
-            R:<select><option value="">–</option><option>Normal</option><option>Dysdiadochokinese</option></select>
-            L:<select><option value="">–</option><option>Normal</option><option>Dysdiadochokinese</option></select>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Unauffällig</option><option>Dysdiadochokinese</option></select>
+                <span>L:</span><select><option value="">–</option><option>Unauffällig</option><option>Dysdiadochokinese</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="koordination"> Rebound</label>
-            <select><option value="">–</option><option>Negativ bds.</option><option>Positiv R</option><option>Positiv L</option></select>
+            <label><input type="checkbox" data-cat="koordination"> Rebound-Phänomen</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+                <span>L:</span><select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+            </div>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Koordination (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Koordination"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 7: GANG -->
+<!-- === 7. GANG === -->
 <div class="exam-section" data-category="gang">
     <div class="section-header" onclick="toggleSection(this)">
         <span>▸ 7. Gangbild / Stand</span>
-        <span class="badge" data-cat="gang">0/4</span>
+        <span class="section-badge" id="badge-gang">0/1</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
             <label><input type="checkbox" data-cat="gang"> Gangbild</label>
-            <select><option value="">–</option><option>Normal</option><option>Breitbasig</option><option>Spastisch</option><option>Ataktisch</option><option>Kleinschrittig</option><option>Hinkend</option></select>
+            <select><option value="">–</option><option>Normal</option><option>Spastisch</option><option>Ataktisch</option><option>Kleinschrittig</option><option>Hemiparetisch</option><option>Nicht beurteilbar</option></select>
+        </div>
+        <div class="exam-item">
+            <label><input type="checkbox" data-cat="gang"> Romberg-Versuch</label>
+            <select><option value="">–</option><option>Negativ (stabil)</option><option>Positiv (Schwanken)</option><option>Fallneigung R</option><option>Fallneigung L</option></select>
+        </div>
+        <div class="exam-item">
+            <label><input type="checkbox" data-cat="gang"> Unterberger-Tretversuch</label>
+            <select><option value="">–</option><option>Keine Abweichung</option><option>Drehung nach R</option><option>Drehung nach L</option></select>
         </div>
         <div class="exam-item">
             <label><input type="checkbox" data-cat="gang"> Seiltänzergang</label>
             <select><option value="">–</option><option>Sicher</option><option>Unsicher</option><option>Nicht möglich</option></select>
         </div>
-        <div class="exam-item">
-            <label><input type="checkbox" data-cat="gang"> Romberg</label>
-            <select><option value="">–</option><option>Negativ</option><option>Positiv – Fallneigung R</option><option>Positiv – Fallneigung L</option><option>Positiv – bei Augenschluss</option></select>
-        </div>
-        <div class="exam-item">
-            <label><input type="checkbox" data-cat="gang"> Unterberger-Tretversuch</label>
-            <select><option value="">–</option><option>Keine Drehung</option><option>Drehung nach R</option><option>Drehung nach L</option></select>
-        </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Gang (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Gang"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 8: REFLEXE -->
+<!-- === 8. REFLEXE === -->
 <div class="exam-section" data-category="reflexe">
     <div class="section-header" onclick="toggleSection(this)">
         <span>▸ 8. Muskeleigenreflexe</span>
-        <span class="badge" data-cat="reflexe">0/6</span>
+        <span class="section-badge" id="badge-reflexe">0/1</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="reflexe"> BSR (Bizeps)</label>
-            R:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
-            L:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            <label><input type="checkbox" data-cat="reflexe"> Bizepssehnenreflex (BSR)</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+                <span>L:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="reflexe"> TSR (Trizeps)</label>
-            R:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
-            L:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            <label><input type="checkbox" data-cat="reflexe"> Trizepssehnenreflex (TSR)</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+                <span>L:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="reflexe"> RPR (Radius)</label>
-            R:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
-            L:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            <label><input type="checkbox" data-cat="reflexe"> Radiusperiostreflex (RPR)</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+                <span>L:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="reflexe"> PSR (Patella)</label>
-            R:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
-            L:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            <label><input type="checkbox" data-cat="reflexe"> Patellarsehnenreflex (PSR)</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+                <span>L:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="reflexe"> ASR (Achilles)</label>
-            R:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
-            L:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            <label><input type="checkbox" data-cat="reflexe"> Achillessehnenreflex (ASR)</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+                <span>L:</span><select><option value="">–</option><option>Normal</option><option>Gesteigert</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="reflexe"> Tibialis-posterior-Reflex</label>
-            R:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
-            L:<select><option value="">–</option><option>Normal</option><option>Lebhaft</option><option>Abgeschwächt</option><option>Fehlend</option></select>
+            <label><input type="checkbox" data-cat="reflexe"> Trömner / Knipsreflex</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+                <span>L:</span><select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+            </div>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Reflexe (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Reflexe"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 9: PYRAMIDENZEICHEN -->
+<!-- === 9. PYRAMIDENZEICHEN === -->
 <div class="exam-section" data-category="pyramiden">
     <div class="section-header" onclick="toggleSection(this)">
-        <span>▸ 9. Pyramidenbahnzeichen</span>
-        <span class="badge" data-cat="pyramiden">0/3</span>
+        <span>▸ 9. Pyramidenzeichen</span>
+        <span class="section-badge" id="badge-pyramiden">0/1</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="pyramiden"> Babinski</label>
-            R:<select><option value="">–</option><option>Negativ</option><option>Positiv</option><option>Indifferent</option></select>
-            L:<select><option value="">–</option><option>Negativ</option><option>Positiv</option><option>Indifferent</option></select>
+            <label><input type="checkbox" data-cat="pyramiden"> Babinski-Zeichen</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Negativ (Flexion)</option><option>Positiv (Extension)</option><option>Indifferent</option></select>
+                <span>L:</span><select><option value="">–</option><option>Negativ (Flexion)</option><option>Positiv (Extension)</option><option>Indifferent</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="pyramiden"> Trömner</label>
-            R:<select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
-            L:<select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+            <label><input type="checkbox" data-cat="pyramiden"> Oppenheim-Zeichen</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+                <span>L:</span><select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+            </div>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="pyramiden"> Kloni (Fuss/Patella)</label>
-            <select><option value="">–</option><option>Keine</option><option>Erschöpflich</option><option>Unerschöpflich</option></select>
+            <label><input type="checkbox" data-cat="pyramiden"> Gordon-Zeichen</label>
+            <div class="side-inputs">
+                <span>R:</span><select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+                <span>L:</span><select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+            </div>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Pyramidenzeichen (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Pyramidenzeichen"></textarea>
         </div>
     </div>
 </div>
 
-<!-- SEK 10: MENINGEAL -->
+<!-- === 10. MENINGEAL === -->
 <div class="exam-section" data-category="meningeal">
     <div class="section-header" onclick="toggleSection(this)">
-        <span>▸ 10. Meningeale Zeichen</span>
-        <span class="badge" data-cat="meningeal">0/3</span>
+        <span>▸ 10. Meningeale Zeichen (optional)</span>
+        <span class="section-badge" id="badge-meningeal">0/–</span>
     </div>
     <div class="section-body">
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="meningeal"> Nackensteifigkeit</label>
-            <select><option value="">–</option><option>Keine</option><option>Leicht</option><option>Ausgeprägt</option></select>
+            <label><input type="checkbox" data-cat="meningeal"> Meningismus</label>
+            <select><option value="">–</option><option>Kein Meningismus</option><option>Nackensteifigkeit</option></select>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="meningeal"> Kernig</label>
-            <select><option value="">–</option><option>Negativ</option><option>Positiv R</option><option>Positiv L</option><option>Positiv bds.</option></select>
+            <label><input type="checkbox" data-cat="meningeal"> Brudzinski-Zeichen</label>
+            <select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
         </div>
         <div class="exam-item">
-            <label><input type="checkbox" data-cat="meningeal"> Lasègue</label>
-            R:<select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
-            L:<select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
+            <label><input type="checkbox" data-cat="meningeal"> Kernig-Zeichen</label>
+            <select><option value="">–</option><option>Negativ</option><option>Positiv</option></select>
         </div>
         <div class="freitext-row">
-            <textarea placeholder="Freitext Meningeale Zeichen (kein Einfluss auf TARDOC)"></textarea>
+            <textarea placeholder="Freitext Meningeale Zeichen"></textarea>
         </div>
     </div>
 </div>
@@ -410,11 +474,9 @@
 
     <div class="sidebar-card">
         <h3>⚡ Aktionen</h3>
-        <button class="btn green" onclick="fillNormal()">✅ Normalbefund</button>
-        <button class="btn red" onclick="clearAll()">🗑️ Zurücksetzen</button>
-        <button class="btn blue" onclick="generateReport()">📄 Bericht</button>
-        <button class="btn grey" onclick="copyReport()">📋 Kopieren</button>
-        <button class="btn grey" onclick="window.print()">🖨️ Drucken</button>
+        <button class="btn btn-normal" onclick="fillNormal()">✅ Normalbefund</button>
+        <button class="btn btn-clear" onclick="clearAll()">🗑️ Zurücksetzen</button>
+        <button class="btn btn-print" onclick="window.print()">🖨️ Drucken / PDF</button>
     </div>
 
 </aside>
@@ -423,15 +485,16 @@
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modal">
-    <div class="modal">
-        <div class="modal-head">
+    <div class="modal-content">
+        <div class="modal-header">
             <h2>📄 Bericht</h2>
-            <button onclick="closeModal()">✕</button>
+            <button class="modal-close" onclick="closeModal()">✕</button>
         </div>
-        <pre id="reportText"></pre>
-        <div class="modal-foot">
-            <button class="btn blue" onclick="copyReport()">Kopieren</button>
-            <button class="btn grey" onclick="closeModal()">Schliessen</button>
+        <div class="modal-body">
+            <pre id="reportText"></pre>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-print" onclick="closeModal()">Schliessen</button>
         </div>
     </div>
 </div>
