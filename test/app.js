@@ -69,10 +69,12 @@ const TARDOC_CODES = {
 // ============================================
 // STATE
 // ============================================
-let counts = {};
+var counts = {};
 Object.keys(CATEGORIES).forEach(function (k) {
     counts[k] = 0;
 });
+// Globale Variable für aktuelle TARDOC-Positionen (für PDF)
+var currentTardocPositions = [];
 // ============================================
 // INIT
 // ============================================
@@ -180,7 +182,6 @@ Object.keys(CATEGORIES).forEach(function (cat) {
     row.classList.remove('fulfilled', 'partial', 'missing');
 
     if (min === 0) {
-        // Optionale Kategorie (z.B. Meningeal)
         if (cnt > 0) {
             row.classList.add('fulfilled');
             statusEl.textContent = '✓';
@@ -219,6 +220,9 @@ updateAmpel(fulfilled);
 
 // TARDOC-Abrechnung
 updateTardocAbrechnung(fulfilled);
+
+// PDF TARDOC-Box aktualisieren
+updatePrintTardoc();
 }
 // ============================================
 // TARDOC ABRECHNUNGS-LOGIK
@@ -230,7 +234,7 @@ function updateTardocAbrechnung(fulfilled) {
 var erfuellteGruppen = new Set();
 
 Object.keys(CATEGORIES).forEach(function (cat) {
-    if (cat === 'hirnnerven') return; // Hirnnerven separat behandelt
+    if (cat === 'hirnnerven') return;
 
     var cfg = CATEGORIES[cat];
     var minCheck = Math.max(cfg.minRequired, 1);
@@ -243,14 +247,14 @@ Object.keys(CATEGORIES).forEach(function (cat) {
     }
 });
 
-// Bilaterale Untersuchungen → zusätzliche Gruppen
-if (counts.motorik >= 2)       erfuellteGruppen.add(3);  // Motorik 3-4 Ext.
-if (counts.kraft >= 2)         erfuellteGruppen.add(5);  // Parese 3-4 Ext.
-if (counts.sensibilitaet >= 2) erfuellteGruppen.add(8);  // Sensorik 3-4 Ext.
+// Bilaterale Untersuchungen
+if (counts.motorik >= 2)       erfuellteGruppen.add(3);
+if (counts.kraft >= 2)         erfuellteGruppen.add(5);
+if (counts.sensibilitaet >= 2) erfuellteGruppen.add(8);
 
 var anzahlMPGruppen = erfuellteGruppen.size;
 
-// 2) Hirnnerven: je 2 Items ≈ 1 Gruppe (max 7)
+// 2) Hirnnerven
 var hnCount = counts.hirnnerven || 0;
 var hnGruppen = Math.min(Math.floor(hnCount / 2), 7);
 
@@ -258,7 +262,6 @@ var hnGruppen = Math.min(Math.floor(hnCount / 2), 7);
 var positions = [];
 
 if (fulfilled >= totalReq) {
-    // VOLLSTATUS
     positions.push({
         code: TARDOC_CODES.vollstatus.code,
         name: TARDOC_CODES.vollstatus.name,
@@ -267,9 +270,7 @@ if (fulfilled >= totalReq) {
     });
 
 } else if (anzahlMPGruppen > 0 || hnGruppen > 0) {
-    // TEILSTATUS
 
-    // Körper-Exploration
     if (anzahlMPGruppen > 0) {
         if (anzahlMPGruppen <= 3) {
             positions.push({
@@ -291,7 +292,6 @@ if (fulfilled >= totalReq) {
         }
     }
 
-    // Hirnnerven-Exploration (zusätzlich)
     if (hnGruppen > 0) {
         if (hnGruppen <= 3) {
             positions.push({
@@ -312,7 +312,10 @@ if (fulfilled >= totalReq) {
     }
 }
 
-// 4) Rendering
+// Global speichern für PDF
+currentTardocPositions = positions;
+
+// 4) Sidebar-Rendering
 if (positions.length === 0) {
     posEl.className = 'tardoc-position';
     posEl.innerHTML = '<span style="color:#999">Noch keine Position abrechenbar</span>';
@@ -348,6 +351,33 @@ for (var i = 0; i < positions.length; i++) {
 }
 
 posEl.innerHTML = html;
+}
+// ============================================
+// PDF TARDOC-BOX AKTUALISIEREN
+// ============================================
+function updatePrintTardoc() {
+    var printTardocEl = document.getElementById('printTardoc');
+    if (!printTardocEl) return;
+if (currentTardocPositions.length === 0) {
+    printTardocEl.innerHTML =
+        '<strong>TARDOC:</strong> Keine Position abrechenbar';
+    return;
+}
+
+var lines = [];
+for (var i = 0; i < currentTardocPositions.length; i++) {
+    var p = currentTardocPositions[i];
+    lines.push(
+        '<div style="margin-bottom:4px;">' +
+            '<strong>' + p.code + '</strong> – ' + p.name +
+            '<br><span style="font-size:11px;color:#666;">' + p.detail + '</span>' +
+        '</div>'
+    );
+}
+
+printTardocEl.innerHTML =
+    '<strong>TARDOC-Abrechnung:</strong>' +
+    '<div style="margin-top:4px;">' + lines.join('') + '</div>';
 }
 // ============================================
 // HELPER: Gruppennamen aus Set
