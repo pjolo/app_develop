@@ -561,6 +561,34 @@ header p {
 }
 
 /* ============================================
+   SCROLLBAR SIDEBAR
+   ============================================ */
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.exam-section {
+    animation: fadeIn 0.3s ease;
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 900px) {
@@ -616,14 +644,13 @@ header p {
    PRINT
    ============================================ */
 @media print {
+
     /* Hide screen-only elements */
     header,
     .sidebar,
     .ampel-card,
     .modal-overlay,
-    .btn,
-    .freitext-row textarea:placeholder-shown,
-    input[type="checkbox"] {
+    .btn {
         display: none !important;
     }
 
@@ -672,10 +699,13 @@ header p {
         border-radius: 0;
         margin-bottom: 6px;
         break-inside: avoid;
+        animation: none;
     }
 
     .section-header {
         background: #f0f0f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
         padding: 6px 12px;
         border-bottom: 1px solid #ccc;
     }
@@ -695,7 +725,7 @@ header p {
         display: none !important;
     }
 
-    /* Checked items print style */
+    /* Checked items */
     .exam-item.checked {
         border-left: 2px solid #2c3e50;
         background: none;
@@ -708,81 +738,79 @@ header p {
         font-size: 10pt;
     }
 
-    .exam-item.checked select,
-    .exam-item.checked input[type="text"],
-    .exam-item.checked input[type="number"] {
+    .exam-item select,
+    .exam-item input[type="text"],
+    .exam-item input[type="number"] {
         border: none;
-        background: none;
-        font-weight: 400;
         font-size: 10pt;
-        padding: 0;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
+        background: transparent;
     }
 
-    /* Freitext with content */
-    .freitext-row {
-        padding: 2px 12px;
-        background: none;
-    }
-
-    .freitext-row textarea {
-        border: none;
-        background: none;
-        font-size: 10pt;
-        font-style: italic;
-        padding: 2px 0;
-        resize: none;
-        min-height: auto;
-        overflow: hidden;
-    }
-
-    /* Hide sections with no checked items */
-    .exam-section:not(:has(.exam-item.checked)):not(:has(textarea:not(:placeholder-shown))) {
+    .exam-item input[type="checkbox"] {
         display: none !important;
     }
 
-    /* Sub-checks */
-    .sub-checks input[type="checkbox"] {
-        display: inline-block !important;
-        width: 12px;
-        height: 12px;
+    /* Freitext rows inside sections */
+    .freitext-row {
+        padding: 2px 12px 6px;
+        background: transparent;
     }
 
-    .side-inputs span {
-        font-size: 10pt;
+    .freitext-row textarea {
+        border: none !important;
+        background: transparent !important;
+        font-size: 9.5pt;
+        resize: none;
+        min-height: auto;
+        font-style: italic;
+        color: #333;
     }
-}
 
-/* ============================================
-   SCROLLBAR (Sidebar)
-   ============================================ */
-.sidebar::-webkit-scrollbar {
-    width: 6px;
-}
+    /* Hide empty freitext */
+    .freitext-row textarea:placeholder-shown {
+        display: none !important;
+    }
 
-.sidebar::-webkit-scrollbar-track {
-    background: transparent;
-}
+    /* ============================================
+       BEMERKUNGEN – letzter Abschnitt
+       ============================================ */
+    .exam-section:last-of-type .section-header {
+        display: none !important;
+    }
 
-.sidebar::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 3px;
-}
+    .exam-section:last-of-type .section-body {
+        max-height: none !important;
+        overflow: visible !important;
+        border-left: 4px solid #3498db !important;
+        padding: 10px 16px 12px 16px;
+        margin-top: 14px;
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        break-inside: avoid;
+    }
 
-.sidebar::-webkit-scrollbar-thumb:hover {
-    background: #aaa;
-}
+    .exam-section:last-of-type .section-body::before {
+        content: 'Bemerkungen:';
+        display: block;
+        font-weight: 700;
+        font-style: italic;
+        font-size: 11pt;
+        color: #1a1a2e;
+        margin-bottom: 6px;
+    }
 
-/* ============================================
-   ANIMATIONS
-   ============================================ */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.exam-section {
-    animation: fadeIn 0.3s ease;
+    .exam-section:last-of-type .section-body textarea {
+        border: none !important;
+        background: transparent !important;
+        font-size: 10.5pt;
+        font-style: italic;
+        color: #333;
+        padding: 0;
+        resize: none;
+        width: 100%;
+        font-family: inherit;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 }
