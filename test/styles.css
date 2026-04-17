@@ -750,30 +750,59 @@ header p {
         display: none !important;
     }
 
-    /* Freitext rows inside sections */
+    /* ============================================
+       FREITEXT / INLINE BEMERKUNGEN – blauer Balken
+       ============================================ */
+
+    /* Leere Freitext-Felder komplett ausblenden */
+    .freitext-row:has(textarea:placeholder-shown) {
+        display: none !important;
+    }
+
+    /* Freitext mit Inhalt: blauer Balken-Stil */
     .freitext-row {
-        padding: 2px 12px 6px;
-        background: transparent;
+        padding: 8px 16px 8px 16px;
+        margin: 4px 0;
+        background: #f8f9fa !important;
+        border-left: 4px solid #3498db !important;
+        border-radius: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        break-inside: avoid;
+    }
+
+    .freitext-row::before {
+        content: 'Bemerkung:';
+        display: block;
+        font-weight: 700;
+        font-style: italic;
+        font-size: 9.5pt;
+        color: #1a1a2e;
+        margin-bottom: 3px;
     }
 
     .freitext-row textarea {
         border: none !important;
         background: transparent !important;
         font-size: 9.5pt;
-        resize: none;
-        min-height: auto;
         font-style: italic;
         color: #333;
-    }
-
-    /* Hide empty freitext */
-    .freitext-row textarea:placeholder-shown {
-        display: none !important;
+        padding: 0;
+        resize: none;
+        min-height: auto;
+        width: 100%;
+        font-family: inherit;
     }
 
     /* ============================================
-       BEMERKUNGEN – letzter Abschnitt
+       ALLGEMEINE BEMERKUNGEN – letzter Abschnitt
        ============================================ */
+
+    /* Leere allgemeine Bemerkungen ausblenden */
+    .exam-section:last-of-type:has(textarea:placeholder-shown) {
+        display: none !important;
+    }
+
     .exam-section:last-of-type .section-header {
         display: none !important;
     }
@@ -812,5 +841,10 @@ header p {
         font-family: inherit;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+    }
+
+    /* Hide sections with no checked items AND no filled text */
+    .exam-section:not(:last-of-type):not(:has(.exam-item.checked)):not(:has(textarea:not(:placeholder-shown))) {
+        display: none !important;
     }
 }
